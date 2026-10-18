@@ -6,6 +6,13 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0b0816">
 <title>Noche en el Cementerio</title>
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cementerio">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script src="config.js"></script>
 <style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}html,body{margin:0;height:100%}[hidden]{display:none!important}</style>
 </head>
@@ -385,7 +392,9 @@ const $ = s => document.querySelector(s);
    Con config.js (web real) + enlace personal ?i=CODIGO, todo se guarda en Supabase.
    Sin eso (boceto en Claude), funciona en modo demo con datos de ejemplo. */
 const CFG = window.HW_CONFIG || null;
-const TOKEN = (()=>{ try{ return new URLSearchParams(location.search).get("i"); }catch(e){ return null; } })();
+/* El código llega en el enlace (?i=...). Se recuerda en el móvil por si la app guardada en la pantalla de inicio se abre sin él. */
+const TOKEN = (()=>{ let t=null; try{ t=new URLSearchParams(location.search).get("i"); }catch(e){}
+  try{ if(t) localStorage.setItem("hw-token",t); else if(window.HW_CONFIG) t=localStorage.getItem("hw-token"); }catch(e){} return t; })();
 const LIVE = !!(CFG && TOKEN);
 async function api(fn, args){
   const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {method:"POST", headers:{apikey:CFG.key, Authorization:`Bearer ${CFG.key}`, "Content-Type":"application/json"}, body:JSON.stringify(args)});
