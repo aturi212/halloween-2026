@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Panel Anfitriones</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Mono:wght@400;500&display=swap">
+<script src="config.js"></script>
+<style>
+/* Panel de anfitriones: resumen arriba, invitados con su enlace personal, notas del tablón */
+:root{--bg:#0b2e38;--surface:#0f3a44;--line:#17525a;--fg:#e8f4f0;--muted:#8eb0b4;--accent:#ffb455;--ok:#7fd1a0;--warn:#ffc98f;--bad:#ff9aa8;
+  --f-body:"Bricolage Grotesque",system-ui,sans-serif;--f-mono:"DM Mono",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.wrap{max-width:880px;margin:0 auto;display:grid;gap:28px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.05;margin:4px 0 0;font-weight:800}
+h2{font-size:18px;margin:0;font-weight:800}
+section{display:grid;gap:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums}
+.pill{font:500 11px var(--f-mono);padding:2px 8px;border-radius:999px;display:inline-block;background:var(--line);color:var(--muted)}
+.pill.si{background:var(--ok);color:#081820}.pill.quiza{background:var(--warn);color:#081820}.pill.no{background:var(--bad);color:#081820}
+.host{font:500 10px var(--f-mono);color:var(--accent);margin-left:6px}
+button,.btn{font:600 13px var(--f-body);background:var(--fg);color:var(--bg);border:0;border-radius:8px;padding:7px 12px;cursor:pointer}
+button.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+form.add{display:flex;gap:8px;flex-wrap:wrap}
+form.add input{flex:1 1 220px;min-width:0;font:15px var(--f-body);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.notes{display:grid;gap:8px}
+.note{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.note p{margin:0;overflow-wrap:anywhere}.note small{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.note.hidden p{opacity:.45;text-decoration:line-through}
+.msg{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:14px 16px;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Solo anfitriones · Halloween 2026</span>
+    <h1>Panel de la fiesta</h1>
+  </header>
+  <p class="msg" id="msg">Cargando…</p>
+  <div id="app" hidden>
+    <section>
+      <h2>Resumen</h2>
+      <div class="stats" id="stats"></div>
+    </section>
+    <section style="margin-top:28px">
+      <h2>Invitados</h2>
+      <form class="add" id="add"><input id="nick" maxlength="20" placeholder="Nombre del nuevo invitado" required><button>Añadir y crear enlace</button></form>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Invitado</th><th>Casa</th><th>Fiesta</th><th>Cenado</th><th>Disfraz</th><th>Caramelos</th><th>Abrió</th><th>Enlace</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+    </section>
+    <section style="margin-top:28px">
+      <h2>Tablón de notas</h2>
+      <div class="notes" id="notes"></div>
+    </section>
+  </div>
+</div>
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const CFG = window.HW_CONFIG, TOKEN = new URLSearchParams(location.search).get("i");
+const BASE = new URL("./", location.href).href;  // funciona en dominio propio y en usuario.github.io/repo/
+async function api(fn, args){
+  const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {method:"POST", headers:{apikey:CFG.key, Authorization:`Bearer ${CFG.key}`, "Content-Type":"application/json"}, body:JSON.stringify({p_token:TOKEN, ...args})});
+  if(!r.ok) throw new Error(await r.text()); const t=await r.text(); return t?JSON.parse(t):null;
+}
+const L = {attend:{si:"Viene",quiza:"Quizá",no:"No viene"}, yn:{si:"Sí",no:"No"}};
+const fmt = d => d ? new Date(d).toLocaleString("es-ES",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "—";
+function cell(tr, text, cls){ const td=document.createElement("td"); if(cls) td.className=cls; td.textContent=text; tr.appendChild(td); return td; }
+async function load(){
+  let d;
+  try{ d = await api("halloween_admin"); }catch(e){ $("#msg").textContent = "Este enlace no es de anfitrión."; return; }
+  $("#msg").hidden = true; $("#app").hidden = false;
+  const g = d.guests, yes = g.filter(x=>x.attend==="si");
+  $("#stats").innerHTML = "";
+  [[yes.length,"vienen a casa"],[g.filter(x=>x.attend==="quiza").length,"quizá"],[yes.filter(x=>x.party==="si").length,"siguen a la fiesta"],
+   [yes.filter(x=>x.dinner==="no").length,"vienen sin cenar"],[g.filter(x=>x.attend==="no").length,"no pueden"],[g.filter(x=>!x.attend).length,"sin responder"],[g.filter(x=>x.opened_at).length+"/"+g.length,"abrieron su enlace"]]
+   .forEach(([v,l])=>{ const s=document.createElement("div"); s.className="stat"; s.innerHTML="<b></b><span></span>"; s.querySelector("b").textContent=v; s.querySelector("span").textContent=l; $("#stats").appendChild(s); });
+  const tb = $("#rows"); tb.innerHTML = "";
+  for(const x of g){
+    const tr = document.createElement("tr");
+    const n = cell(tr, x.nick); if(x.is_host){ const h=document.createElement("span"); h.className="host"; h.textContent="ANFITRIÓN"; n.appendChild(h); }
+    const td = document.createElement("td"); const p=document.createElement("span"); p.className="pill "+(x.attend||""); p.textContent=L.attend[x.attend]||"Sin responder"; td.appendChild(p); tr.appendChild(td);
+    cell(tr, L.yn[x.party]||"—"); cell(tr, L.yn[x.dinner]||"—"); cell(tr, L.yn[x.costume]||"—"); cell(tr, x.candy, "num"); cell(tr, fmt(x.opened_at));
+    const lc = document.createElement("td"); const b=document.createElement("button"); b.className="ghost"; b.textContent="Copiar enlace";
+    const link = BASE + "?i=" + x.token;
+    b.onclick = async ()=>{ try{ await navigator.clipboard.writeText(link); b.textContent="¡Copiado!"; }catch(e){ prompt("Enlace de "+x.nick, link); } setTimeout(()=>b.textContent="Copiar enlace",1500); };
+    lc.appendChild(b); tr.appendChild(lc); tb.appendChild(tr);
+  }
+  const nt = $("#notes"); nt.innerHTML = "";
+  if(!d.notes.length){ nt.innerHTML = '<p class="empty">Todavía no hay notas en el tablón.</p>'; }
+  for(const m of d.notes){
+    const row=document.createElement("div"); row.className="note"+(m.hidden?" hidden":"");
+    const t=document.createElement("div"); const p=document.createElement("p"); p.textContent=m.text; const s=document.createElement("small"); s.textContent=`${m.by} · ${fmt(m.at)}${m.hidden?" · oculta":""}`; t.append(p,s);
+    const b=document.createElement("button"); b.className="ghost"; b.textContent=m.hidden?"Mostrar":"Ocultar";
+    b.onclick=async()=>{ await api("halloween_admin_note",{p_note:m.id,p_hidden:!m.hidden}); load(); };
+    row.append(t,b); nt.appendChild(row);
+  }
+}
+$("#add").addEventListener("submit", async e=>{
+  e.preventDefault(); const nick=$("#nick").value.trim(); if(!nick) return;
+  try{ await api("halloween_admin_add_guest",{p_nick:nick}); $("#nick").value=""; load(); }catch(err){ alert("No se pudo añadir: "+err.message); }
+});
+if(!CFG || !TOKEN){ $("#msg").textContent = "Abre este panel con tu enlace de anfitrión."; } else { load(); setInterval(load, 30000); }
+})();
+</script>
+</body>
+</html>
