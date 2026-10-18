@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0b0816">
 <title>Noche en el Cementerio</title>
@@ -29,7 +29,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
+html,body{height:100%;touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%}
 body{background:var(--void);color:var(--paper);font-family:var(--px);margin:0;
   padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px));
   display:grid;place-items:center;overflow:hidden;user-select:none;-webkit-user-select:none}
@@ -777,6 +777,11 @@ function update(now){
 function loop(now){ update(now); if(!$("#s-prof").hidden) drawPreview(now); if(mode==="title"){ if(!gc.width) gateResize(); drawGate(now); } else render(now); requestAnimationFrame(loop); }
 
 /* ================= INPUT ================= */
+/* Sin zoom accidental: bloquea pellizcar y doble toque (iPhone ignora user-scalable=no en Safari) */
+["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}));
+document.addEventListener("touchmove",e=>{ if(e.touches.length>1 || e.scale && e.scale!==1) e.preventDefault(); },{passive:false});
+let lastTouchEnd=0;
+document.addEventListener("touchend",e=>{ const n=Date.now(); if(n-lastTouchEnd<320 && !e.target.closest("input,textarea")) e.preventDefault(); lastTouchEnd=n; },{passive:false});
 /* Cruceta: una sola zona táctil. La dirección sigue al dedo mientras se desliza (multitáctil: cada mando lleva su propio dedo) */
 const padEl=$("#pad"); let padId=null, padDir=null, keyDir=null;
 function syncHeld(){ held = padDir || keyDir; document.querySelectorAll(".pad button").forEach(b=>b.classList.toggle("on", b.dataset.d===padDir)); }
@@ -1300,7 +1305,6 @@ function drawPreview(now){
 }
 $("#p-save").onclick=()=>{
   if(!draft.attend){ $("#err").textContent="Dinos si vienes a casa."; return; }
-  if(going(draft)){ const miss = QS.find(([k])=>!draft[k]); if(miss){ $("#err").textContent="Te falta: "+miss[1]; return; } }
   const wasGhost = !confirmed(me);
   me = {...draft, nick:(draft.nick||INVITE_NAME).trim()}; save();
   $("#s-prof").hidden=true;
