@@ -1410,7 +1410,7 @@ const GATE_T = new Set(["14,29","15,29","14,30","15,30"]);
 let gateOpenUntil = 0;
 const solidAt = (x,y) => GATE_T.has(x+","+y) || x<0||y<0||x>=W||y>=H||(SC.walk[y][x]!=="1"&&MAP[y][x]!=="m")||!!OBJ[x+","+y];
 const IMG = {};
-["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png"; });
+["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png?v=20261020b"; });
 /* Solo el SÍ da personaje: los de QUIZÁ siguen de fantasma */
 const confirmed = r => !!r && r.attend==="si";
 const look = r => confirmed(r) ? r : {...r, char:"fantasma", color:"#cfc8e6", party:"", costume:"", ghost:true};
