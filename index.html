@@ -1410,7 +1410,7 @@ const GATE_T = new Set(["14,29","15,29","14,30","15,30"]);
 let gateOpenUntil = 0;
 const solidAt = (x,y) => GATE_T.has(x+","+y) || x<0||y<0||x>=W||y>=H||(SC.walk[y][x]!=="1"&&MAP[y][x]!=="m")||!!OBJ[x+","+y];
 const IMG = {};
-["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png?v=20261020b"; });
+["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png?v=20261020c"; });
 /* Solo el SÍ da personaje: los de QUIZÁ siguen de fantasma */
 const confirmed = r => !!r && r.attend==="si";
 const look = r => confirmed(r) ? r : {...r, char:"fantasma", color:"#cfc8e6", party:"", costume:"", ghost:true};
@@ -1835,13 +1835,13 @@ function render(now){
   g.globalCompositeOperation="lighter";
   if(camX+VW > 30*TS){ // luz fría y mágica del claro
     const glow=(x,y,r,col,a)=>{ const lg=g.createRadialGradient(x,y,0,x,y,r); lg.addColorStop(0,`rgba(${col},${a})`); lg.addColorStop(1,`rgba(${col},0)`); g.fillStyle=lg; g.fillRect(x-r,y-r,r*2,r*2); };
-    glow(CLARO.cx*TS-camX, CLARO.cy*TS+4-camY, 90, "90,200,255", .16+.04*Math.sin(t*1.3));
+    glow(CLARO.cx*TS-camX, CLARO.cy*TS+4-camY, 95, "160,110,255", .2+.05*Math.sin(t*1.3));
     CLARO.stones.forEach(([sx,sy],k)=>{ const pulse=.5+.5*Math.sin(t*1.7+k*1.3); glow(sx*TS+16-camX, sy*TS+30-MENHIR_SPR[k%2].height+20-camY, 22, "190,120,255", .18+.3*pulse);
       if(pulse>.2){ g.fillStyle=`rgba(220,170,255,${.35+.6*pulse})`; RUNES[k%2].forEach(([rx,ry])=>g.fillRect(sx*TS+5+rx-camX, sy*TS+30-MENHIR_SPR[k%2].height+3+ry+(k%2?0:2)-camY,1,1)); } });
-    CLARO.mush.forEach(([mx,my],k)=>glow(mx*TS+3-camX, my*TS+2-camY, 14, "110,230,255", .22+.1*Math.sin(t*2+k)));
+    CLARO.mush.forEach(([mx,my],k)=>glow(mx*TS+3-camX, my*TS+2-camY, 14, "150,170,255", .22+.1*Math.sin(t*2+k)));
     for(let i=0;i<22;i++){ const a=t*.25+i*2.39, rr=(i%7)*.8+1.2;
       const fx=(CLARO.cx+Math.cos(a+i)*rr*1.1+Math.sin(t*.7+i)*.4)*TS-camX, fy=(CLARO.cy+Math.sin(a*1.3+i)*rr+Math.cos(t*.5+i)*.3)*TS-camY;
-      if(Math.sin(t*2+i*1.7)<-.4) continue; g.fillStyle=i%3?"rgba(200,150,255,.9)":"rgba(140,240,255,.9)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); }
+      if(Math.sin(t*2+i*1.7)<-.4) continue; g.fillStyle=i%4?"rgba(205,150,255,.9)":"rgba(160,210,255,.9)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); }
     for(let i=0;i<3;i++){ // pista sutil: lucecitas en el hueco del seto
       const fx=(31.2+i*.5+Math.sin(t*.8+i*2)*.4)*TS-camX, fy=(11.9+Math.sin(t*1.1+i)*.5+i*.15)*TS-camY;
       if(Math.sin(t*1.5+i*2.1)>-.2){ glow(fx,fy,9,"190,140,255",.35); g.fillStyle="rgba(230,200,255,.95)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); } }
@@ -1858,8 +1858,10 @@ function render(now){
     g.fillStyle="rgba(255,240,140,.9)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); }
   if(camX+VW > 32*TS){ // niebla que se arrastra por el claro
     g.globalCompositeOperation="source-over";
+    { const X=CLARO.cx*TS-camX, Y=CLARO.cy*TS-camY, R=320; const lg=g.createRadialGradient(X,Y,40,X,Y,R); // velo morado de todo el claro
+      lg.addColorStop(0,"rgba(110,50,190,.22)"); lg.addColorStop(.75,"rgba(80,30,150,.16)"); lg.addColorStop(1,"rgba(80,30,150,0)"); g.fillStyle=lg; g.fillRect(X-R,Y-R,R*2,R*2); }
     for(let i=0;i<7;i++){ const fx=((i*3.1+t*.06*(i%2?1:-1))%1+1)%1, X=(34+fx*13)*TS-camX, Y=(6.5+((i*.37)%1)*12+Math.sin(t*.2+i)*.6)*TS-camY, R=70+20*(i%3);
-      const lg=g.createRadialGradient(X,Y,0,X,Y,R); lg.addColorStop(0,"rgba(190,180,230,.10)"); lg.addColorStop(1,"rgba(190,180,230,0)"); g.fillStyle=lg; g.fillRect(X-R,Y-R*.6,R*2,R*1.2); } }
+      const lg=g.createRadialGradient(X,Y,0,X,Y,R); lg.addColorStop(0,"rgba(200,170,240,.11)"); lg.addColorStop(1,"rgba(200,170,240,0)"); g.fillStyle=lg; g.fillRect(X-R,Y-R*.6,R*2,R*1.2); } }
   g.globalCompositeOperation="multiply"; g.drawImage(vig,0,0); g.globalCompositeOperation="source-over";
   // a pantalla
   ctx.imageSmoothingEnabled=false; ctx.fillStyle="#05070c"; ctx.fillRect(0,0,cw,ch);
