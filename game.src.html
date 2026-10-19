@@ -1534,7 +1534,9 @@ function render(now){
     if(c.isMe && player.jump){ const k=(now-player.jump)/380; if(k>=1) player.jump=0; else bob += Math.round(Math.sin(k*Math.PI)*12); }
     const spr = spriteFor(c, c.dir||"down", c.moving ? (CRITTER.has(c.char)?(Math.floor(now/140)%2)+1:Math.floor(now/130)%4) : 0);
     c._tag = Y - (hatOn(c)?56:45) - bob;
-    L.push({b:Y, d:()=>{ g.fillStyle="rgba(6,6,14,.42)"; g.beginPath(); g.ellipse(X, Y-1, ghost?8:9, ghost?2:3, 0, 0, 7); g.fill();
+    /* Orden de dibujo por profundidad (en coordenadas del mundo, igual que los objetos): los pies del personaje cuentan como el borde inferior de su casilla,
+       así un objeto de la misma fila (banco, roca, matojo que se pisa) nunca le tapa; sólo tapan los que están más abajo */
+    L.push({b:Y+camY+3, d:()=>{ g.fillStyle="rgba(6,6,14,.42)"; g.beginPath(); g.ellipse(X, Y-1, ghost?8:9, ghost?2:3, 0, 0, 7); g.fill();
       g.globalAlpha = ghost ? .8 : c.attend==="quiza" ? .82 : 1; g.drawImage(spr, X-16, Y-spr.height+1-bob); g.globalAlpha=1; }});
   }
   L.push({b:GATE.base, d:()=>drawGateW(g, camX, camY, now)});
