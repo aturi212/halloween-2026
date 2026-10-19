@@ -156,6 +156,20 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .board-btns{display:flex;gap:10px;justify-content:space-between}
 .board-btns .key{font-weight:400;display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--ink);color:var(--paper);margin-right:6px;font-size:8px}
 
+/* Trile */
+#s-trile{justify-content:center}
+.trile{flex:0 0 auto;background-color:#3a2b18;gap:14px}
+.tr-table{position:relative;height:120px;background:#2c5a3a;border:3px solid #1a1020;box-shadow:inset 0 0 0 3px #3f7a50}
+.tr-hat{position:absolute;top:22px;width:33.33%;height:90px;display:grid;justify-items:center;align-content:end;border:0;background:none;padding:0;cursor:pointer;transition:left .26s steps(6)}
+.tr-hat:disabled{cursor:default}
+.tr-hat .top{width:64px;height:64px;transition:transform .2s steps(4);position:relative;z-index:1}
+.tr-hat .c{width:30px;height:20px;position:absolute;bottom:6px;left:50%;margin-left:-15px;visibility:hidden}
+.tr-hat.up .top{transform:translateY(-34px)}
+.tr-hat.up.has .c{visibility:visible}
+.tr-hat:focus-visible{outline:2px solid var(--candle);outline-offset:-4px}
+.tr-msg{margin:0;font-size:8px;line-height:1.9;color:#f3ead8;min-height:3.8em;white-space:pre-line}
+#tr-candy{font-size:8px;color:#ffe08a}
+
 /* Gramola */
 #s-gramola{justify-content:center}
 .gramola{background-color:#3e2a1a;flex:0 0 auto}
@@ -304,6 +318,17 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
       <button class="pxbtn" id="board-b" type="button"><b class="key">B</b> CERRAR</button>
       <button class="pxbtn alt" id="board-y" type="button"><b class="key">Y</b> ESCRIBIR NOTA</button>
     </div>
+  </div>
+
+  <!-- Trile del espantapájaros -->
+  <div class="screen bscreen" id="s-trile" hidden role="dialog" aria-labelledby="tr-h">
+    <div class="board trile">
+      <div class="board-head"><h2 id="tr-h">EL TRILE</h2><span id="tr-candy"></span></div>
+      <div class="tr-table" id="tr-table"></div>
+      <p class="tr-msg" id="tr-msg" aria-live="polite"></p>
+      <button class="pxbtn alt" id="tr-play" type="button">JUGAR · 1 CARAMELO</button>
+    </div>
+    <div class="board-btns"><button class="pxbtn" id="tr-b" type="button"><b class="key">B</b> CERRAR</button></div>
   </div>
 
   <!-- Gramola -->
@@ -1250,6 +1275,10 @@ const critters = [
 const wisp = {x:21,y:26, fx:21, fy:26, tx:21, ty:26};
 const WISP_SPOTS = [[21,26],[29,13],[9,27],[26,8],[17,3],[7,12],[5,20],[24,24],[2,17],[27,22]];
 let pendingB = null, lookAt = null, crowFedUntil = 0;
+/* Lo que roba el cuervo no desaparece: lo esconde en su nido (el árbol seco de arriba, junto a la tumba de los anfitriones) */
+const NEST = {x:20, y:2};
+let crowStash = 0; try{ crowStash = +localStorage.getItem("hw-nest")||0; }catch(e){}
+function stash(n){ crowStash=Math.max(0,crowStash+n); try{ localStorage.setItem("hw-nest",crowStash); }catch(e){} }
 const camF = {x:14, y:28};
 let notes = []; try{ notes = JSON.parse(localStorage.getItem("hw-notes")||"[]"); }catch(e){}
 const DEMO_NOTES = [
@@ -1558,6 +1587,7 @@ function render(now){
   { const wx=wisp.fx*TS+16-camX, wy=wisp.fy*TS+12-camY+Math.sin(now/400)*3, r=46;
     const lg=g.createRadialGradient(wx,wy,0,wx,wy,r); lg.addColorStop(0,"rgba(140,255,230,.55)"); lg.addColorStop(.25,"rgba(80,220,200,.18)"); lg.addColorStop(1,"rgba(80,220,200,0)");
     g.fillStyle=lg; g.fillRect(wx-r,wy-r,r*2,r*2); g.fillStyle="#e8fff8"; g.fillRect(Math.round(wx-2),Math.round(wy-2),4,4); }
+  if(crowStash>0 && Math.sin(now/260)>.86){ const nx=NEST.x*TS+18-camX, ny=NEST.y*TS-14-camY; g.fillStyle="rgba(255,240,170,.95)"; g.fillRect(nx,ny-2,1,5); g.fillRect(nx-2,ny,5,1); }
   for(let i=0;i<12;i++){ if(Math.sin(now/300+i*3)<-.3) continue;
     const fx=21.5*TS+((i*53)%230)+Math.sin(now/900+i)*14-camX, fy=9.3*TS+((i*37)%190)+Math.cos(now/700+i*2)*10-camY;
     g.fillStyle="rgba(255,240,140,.9)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); }
@@ -1629,7 +1659,7 @@ function advance(e, now, dur){
 let lastPos={x:14,y:28}, moveTimer=0;
 function update(now){
   if(now>(update.vt||0)){ update.vt=now+250; const d=Math.hypot(player.fx-GRAMO.x, player.fy-GRAMO.y); MUSIC.setVol(mode==="play" ? .45*(.35+.65*Math.max(0,1-d/14)) : .3); }
-  if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
+  if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
     advance(player, now, player.from&&player.from[1]===31&&player.y===28?900:170);
     if(LIVE && !player.moving && (player.x!==lastPos.x || player.y!==lastPos.y)){
       lastPos={x:player.x,y:player.y}; clearTimeout(moveTimer);
@@ -1748,6 +1778,7 @@ const KEYS={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",w:
 addEventListener("keydown",e=>{
   if(e.target.closest && e.target.closest("input,textarea,[contenteditable]")) return;
   if(KEYS[e.key] && mode==="play"){ keyDir=KEYS[e.key]; syncHeld(); e.preventDefault(); }
+  if(!$("#s-trile").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeTrile(); return; }
   if(!$("#s-gramola").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeGramola(); return; }
   if(!$("#s-board").hidden){ if(e.key==="Escape"||e.key==="b") boardBack(); if(e.key==="y"&&$("#note-new").hidden) newNote(); return; }
   if((e.key===" "||e.key==="Enter"||e.key==="j") && mode==="play"){ e.preventDefault(); pressA(); }
@@ -1769,7 +1800,7 @@ function pressB(){
       else if(a<b){ setCandy(candy-1); msg+="Pierdes un caramelo.\n'La casa siempre gana.\nY la casa es una tumba.'"; }
       else msg+="Empate. Nadie paga.\nEl esqueleto se ríe:\nclac clac clac.";
       return say("ESQUELETO", msg); }
-    if(pb==="cuervo"){ setCandy(candy-1); crowFedUntil=performance.now()+180000; return say("CUERVO", "Se te posa en el hombro\ny te susurra:\n\n"+gossip()); }
+    if(pb==="cuervo"){ setCandy(candy-1); stash(1); crowFedUntil=performance.now()+180000; return say("CUERVO", "Se te posa en el hombro\ny te susurra:\n\n"+gossip()); }
     if(pb==="hoguera"){ setCandy(candy-1); const opts=FIRE_COLORS.map((_,i)=>i).filter(i=>i!==fireTint.i); const i=opts[Math.floor(Math.random()*opts.length)];
       fireTint={i, until:performance.now()+40000}; return say("HOGUERA", "¡FSSSHHH!\n\nLas llamas se vuelven\n"+FIRE_COLORS[i].name+"."); }
   }
@@ -1831,7 +1862,7 @@ function giveCandy(){
   $("#phone").appendChild(t); setTimeout(()=>t.remove(),1700);
   const rv=critters.find(c=>c.kind==="cuervo");
   if(rv && mode==="play" && performance.now()>crowFedUntil && Math.hypot(rv.x-player.x,rv.y-player.y)<5 && Math.random()<.25){
-    setTimeout(()=>{ if(candy<1) return; setCandy(candy-1);
+    setTimeout(()=>{ if(candy<1) return; setCandy(candy-1); stash(1);
       const t2=document.createElement("div"); t2.className="toast steal"; t2.innerHTML=CANDY_SVG+"<span>¡UN CUERVO TE LO HA ROBADO!</span>";
       $("#phone").appendChild(t2); setTimeout(()=>t2.remove(),1900);
       const spots=[[16,2],[10,3],[20,7],[8,6]]; const [nx,ny]=spots[Math.floor(Math.random()*spots.length)];
@@ -1856,9 +1887,9 @@ function talkCritter(c){
   if(c.kind==="zombie") return say("ZOMBI", "Grrr... ¿un chiste?\n\n"+ZOMBIE_JOKES[Math.floor(Math.random()*ZOMBIE_JOKES.length)], c.rec);
   if(c.kind==="cuervo"){
     if(candy<1) return say("CUERVO", "¡Cra! (Te registra los\nbolsillos, no encuentra\nnada y se ofende.)", c.rec);
-    setCandy(candy-1); toastMsg("¡EL CUERVO TE HA ROBADO!", true);
+    setCandy(candy-1); stash(1); toastMsg("¡EL CUERVO TE HA ROBADO!", true);
     if(candy>0){ pendingB="cuervo"; return say("CUERVO", "¡Cra! Se lo traga entero.\n\nDame otro y te cuento\nun secreto de la fiesta.\n(Pulsa B para dárselo)", c.rec); }
-    return say("CUERVO", "¡Cra! Se lo traga entero.\n\nSi tuvieras otro, te\ncontaría un secreto...", c.rec); }
+    return say("CUERVO", "¡Cra! Se lo guarda en\nel pico y mira de reojo\nhacia un árbol seco.\n\nSi tuvieras otro, te\ncontaría un secreto...", c.rec); }
   if(c.kind==="sepulturero") return say("SEPULTURERO", gossip(), c.rec);
   if(c.kind==="esqueleto"){ const got=maybeCandy(ck,.7); if(got) return say("ESQUELETO", "Toma, a mí no me\nentra nada. Literal.", c.rec);
     if(candy>0 && Math.random()<.6){ pendingB="dados"; return say("ESQUELETO", "¿Nos jugamos un\ncaramelo a los dados?\nSi ganas, te doy dos.\n\nPulsa B para tirar.", c.rec); }
@@ -1880,6 +1911,7 @@ function gossip(){
   const opts=[];
   if(yes.length){ const a=pick(yes); opts.push(`Me han dicho que ${a.nick}\nviene seguro.`); const c=yes.filter(n=>n.costume==="si"); if(c.length) opts.push(`${pick(c).nick} viene disfrazado.\nNo digas que te lo dije.`); const p=yes.filter(n=>n.party==="si"); if(p.length) opts.push(`${pick(p).nick} se queda\nhasta el final. Seguro.`); }
   if(no.length) opts.push(`${pick(no).nick} aún no ha dicho\nnada. Le guardo sitio...`);
+  if(crowStash>0) opts.push("A los cuervos les gusta\nlo que brilla. Y nunca\nolvidan dónde lo esconden.");
   opts.push(`Ya van ${yes.length + (me&&me.attend==="si"?1:0)} confirmados.\nVoy a tener que cavar más.`);
   return pick(opts);
 }
@@ -1907,7 +1939,7 @@ function interact(){
   if(t==="N") return openBoard();
   if(t==="J") return openGramola();
   if(t==="K") return say("TUMBA DE LOS ANFITRIONES", "AQUÍ YACEN\nADRI E IRIS\n\nDescansarán en paz...\ncuando acabe la fiesta.");
-  if(t==="S") return say("ESPANTAPÁJAROS", ["No espanto ni a\nlos cuervos. Mírame.","Si coges calabazas,\nyo no he visto nada.","Llevo aquí plantado\ntoda la noche."][Math.floor(Math.random()*3)]);
+  if(t==="S"){ if(candy<1) return say("ESPANTAPÁJAROS", "Juego al trile con los\nque pasan. Pero sin\ncaramelo no hay apuesta."); return openTrile(); }
   if(t==="H"){ const got=maybeCandy("hog",.35); if(got) return say("HOGUERA", "Entre las brasas hay\nun caramelo tostado.");
     if(candy>0){ pendingB="hoguera"; return say("HOGUERA", "Huele a castañas.\nDicen que si echas un\ncaramelo, el fuego\ncambia de color...\n\nPulsa B para echarlo."); }
     return say("HOGUERA", "Huele a castañas\ny a humo. Qué gusto."); }
@@ -1920,6 +1952,10 @@ function interact(){
   }
   if(t==="O"){ const got=maybeCandy("fuente",.6); return say("FUENTE", got?"En el fondo brilla algo...\n¡un caramelo!":"El agua susurra nombres\nque no conoces."); }
   if(t==="R"||t==="r") return say("ROCA","Una roca con musgo.\nMuy roca, la verdad.");
+  if(t==="Y" && tx===NEST.x && ty===NEST.y){
+    if(crowStash<1) return say("ÁRBOL SECO","Arriba hay un nido vacío.\nHuele a plumas.");
+    const n=crowStash; stash(-n); for(let i=0;i<n;i++) setCandy(candy+1); toastMsg("+"+n+" CARAMELO"+(n>1?"S":""));
+    return say("NIDO DEL CUERVO","Entre las ramas hay un nido\nlleno de cosas brillantes:\nun anillo, una chapa...\n\n¡Y "+(n>1?n+" caramelos":"un caramelo")+"!\nRecuperas lo robado."); }
   if(t==="Y") return say("ÁRBOL SECO","Sus ramas crujen\ncon el viento.");
   if(t==="m") return say("SETAS","Mejor no comerlas.\nHazme caso.");
   if(t==="#") return say("TALUD","Rocas y raíces.\nMejor por la escalera.");
@@ -1927,6 +1963,46 @@ function interact(){
   if(t==="L"){ const got=isLit(tx,ty)&&maybeCandy("fl"+tx+","+ty,.5); return say("FAROL", got?"Junto a la llama hay\nun caramelo calentito.":isLit(tx,ty) ? "La llama tiembla\ncuando pasas." : "Está apagado.\nPulsa B para encenderlo."); }
 }
 const sessionGot = new Map();
+
+/* ================= TRILE DEL ESPANTAPÁJAROS =================
+   Pagas un caramelo, el espantapájaros lo esconde bajo un sombrero y los mezcla. Si aciertas, te llevas dos. */
+const HAT_SVG = `<svg class="top" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path fill="#1a1020" d="M7 1h2v1h1v3h1v3h1v3h3v1h1v2H0v-2h1v-1h3V8h1V5h1V2h1z"/><path fill="#5b3f8c" d="M7 2h2v3h1v3h1v3h3v1h1v1H1v-1h1v-1h3V8h1V5h1z"/><path fill="#7d5bb8" d="M7 2h1v3H7zM6 5h1v3H6zM5 8h1v3H5z"/><path fill="#ff9a3c" d="M4 10h8v1H4z"/></svg>`;
+let trile = {cand:0, state:"idle"};
+function trileSlots(){ return [...$("#tr-table").children]; }
+function paintTrileCandy(){ $("#tr-candy").textContent = candy+" CARAMELOS"; }
+function openTrile(){
+  closeDialog(); const tb=$("#tr-table"); tb.innerHTML="";
+  for(let i=0;i<3;i++){ const b=document.createElement("button"); b.type="button"; b.className="tr-hat"; b.dataset.slot=i; b.style.left=(i*33.33)+"%";
+    b.setAttribute("aria-label","Sombrero "+(i+1)); b.innerHTML=HAT_SVG+CANDY_SVG.replace('class="ico"','class="c"'); b.disabled=true; b.onclick=()=>pickTrile(b); tb.appendChild(b); }
+  trile.state="idle"; $("#tr-msg").textContent="—Psst. Escondo un caramelo bajo\nun sombrero. Si aciertas dónde\nestá, te llevas dos."; $("#tr-play").style.visibility=""; $("#tr-play").textContent="JUGAR · 1 CARAMELO";
+  paintTrileCandy(); $("#s-trile").hidden=false; $("#tr-play").focus();
+}
+function closeTrile(){ if(trile.state==="shuffle") return; $("#s-trile").hidden=true; }
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+async function playTrile(){
+  if(trile.state==="shuffle"||trile.state==="pick") return;
+  if(candy<1){ $("#tr-msg").textContent="Ya no te quedan caramelos.\nVuelve cuando tengas alguno."; return; }
+  setCandy(candy-1); paintTrileCandy(); haptic(15);
+  const hats=trileSlots(); hats.forEach(h=>{ h.classList.remove("up","has"); h.disabled=true; });
+  trile.state="shuffle"; $("#tr-play").style.visibility="hidden"; $("#tr-msg").textContent="Mira bien dónde lo pongo...";
+  const win=hats[Math.floor(Math.random()*3)]; win.classList.add("has","up"); await wait(900); win.classList.remove("up"); await wait(350);
+  $("#tr-msg").textContent="¡Y ahora... a mezclar!";
+  const n=7+Math.floor(Math.random()*4);
+  for(let k=0;k<n;k++){ const a=Math.floor(Math.random()*3), b=(a+1+Math.floor(Math.random()*2))%3;
+    const ha=hats.find(h=>+h.dataset.slot===a), hb=hats.find(h=>+h.dataset.slot===b);
+    ha.dataset.slot=b; hb.dataset.slot=a; ha.style.left=(b*33.33)+"%"; hb.style.left=(a*33.33)+"%"; await wait(Math.max(170, 300-k*14)); }
+  trile.state="pick"; hats.forEach(h=>h.disabled=false); $("#tr-msg").textContent="¿Dónde está el caramelo?\nToca un sombrero.";
+  hats.sort((x,y)=>x.dataset.slot-y.dataset.slot)[0].focus();
+}
+async function pickTrile(h){
+  if(trile.state!=="pick") return; trile.state="done";
+  const hats=trileSlots(); hats.forEach(x=>x.disabled=true); h.classList.add("up");
+  const ok=h.classList.contains("has");
+  if(ok){ setCandy(candy+1); setCandy(candy+1); haptic(30); $("#tr-msg").textContent="¡Bien visto! Te llevas dos.\n—Grr. La próxima no tendrás\ntanta suerte."; }
+  else { await wait(400); hats.find(x=>x.classList.contains("has")).classList.add("up"); $("#tr-msg").textContent="¡Fallaste! Estaba aquí.\n—Je, je. Mis brazos de paja\nson más rápidos que tus ojos."; }
+  paintTrileCandy(); $("#tr-play").style.visibility=""; $("#tr-play").textContent="OTRA VEZ · 1 CARAMELO"; $("#tr-play").focus();
+}
+$("#tr-play").onclick=playTrile; $("#tr-b").onclick=closeTrile;
 
 /* ================= GRAMOLA ================= */
 function openGramola(){ closeDialog(); paintGramola(); $("#gr-spot").href=SPOTIFY_URL; $("#s-gramola").hidden=false; $("#gr-b").focus(); }
