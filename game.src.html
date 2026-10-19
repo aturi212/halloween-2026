@@ -1768,7 +1768,7 @@ function showGuest(c){
   }
   const lines = [TXT.attend[c.attend], c.party?TXT.party[c.party]:"", c.dinner?TXT.dinner[c.dinner]:"", c.costume?TXT.costume[c.costume]:""].filter(Boolean);
   const items = []; if(c.party==="si") items.push("GORRO"); if(c.costume==="si") items.push("CAPA");
-  say((c.isMe?"TÚ · ":"") + (c.nick||"?").toUpperCase() + (c.demo?" (ejemplo)":""), lines.join("\n") + (items.length?`\nOBJETOS: ${items.join(" + ")}`:""), c);
+  say((c.isMe?"TÚ · ":"") + (c.nick||"?").toUpperCase() + (c.demo?" (ejemplo)":""), lines.join("\n"), c);
 }
 function cast(){
   const a = npcs.filter(n=>n.attend!=="no");
