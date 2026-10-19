@@ -1604,6 +1604,13 @@ const occupied = (x,y,self) => critters.some(n=>n!==self && ((n.x===x&&n.y===y)|
 function tryMove(e, dir, now){
   e.dir = dir; const [dx,dy] = D[dir]; const nx=e.x+dx, ny=e.y+dy;
   if(solidAt(nx,ny) || occupied(nx,ny,e)) return false;
+  /* Los demás invitados confirmados son sólidos. Los fantasmas se atraviesan (y si eres fantasma, atraviesas a todos).
+     Si alguien se ha quedado plantado en un paso estrecho, empujando un momento se le atraviesa igualmente. */
+  if(e===player && !look(me||{}).ghost){
+    const blk=npcs.find(n=>n.x===nx&&n.y===ny&&confirmed(n));
+    if(blk){ const k=nx+","+ny; if(tryMove.pk!==k){ tryMove.pk=k; tryMove.pt=now; } if(now-tryMove.pt<1200) return false; }
+    else tryMove.pk=null;
+  }
   e.from=[e.x,e.y]; e.x=nx; e.y=ny; e.moving=true; e.t0=now; return true;
 }
 function advance(e, now, dur){
