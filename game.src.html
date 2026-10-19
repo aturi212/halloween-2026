@@ -1431,6 +1431,25 @@ const LIGHTS = SC.lights.map(([lx,ly,R,a],i)=>{
   const fire=SC.fire.some(f=>Math.abs(f.x+16-lx)<20&&Math.abs(f.y+40-ly)<30);
   return {lx,ly,rx,ry,w,h,m,amp:fire?.22:a<.5?.25:a<.9?.12:.035,ph:i*1.913,tx:best?best.x:-1,ty:best?best.y:-1};
 });
+/* Hoguera de colores: al echarle un caramelo cambia de color un rato */
+const FIRE_COLORS = [
+  {name:"VERDES", hue:95,  glow:[90,255,120]},
+  {name:"AZULES", hue:185, glow:[90,160,255]},
+  {name:"MORADAS", hue:245, glow:[190,110,255]},
+  {name:"ROSAS",  hue:290, glow:[255,110,200]}];
+let fireTint = {i:-1, until:0};
+const FIRE_VAR = [];
+function buildFireVariants(){ try{ buildFireVariants2(); }catch(e){ FIRE_COLORS.forEach((_,k)=>FIRE_VAR[k]=null); } }
+function buildFireVariants2(){
+  const im=IMG.fuego, c0=document.createElement("canvas"); c0.width=im.width; c0.height=im.height; const x0=c0.getContext("2d"); x0.drawImage(im,0,0);
+  const src=x0.getImageData(0,0,im.width,im.height);
+  FIRE_COLORS.forEach((fc,k)=>{ const d=new ImageData(new Uint8ClampedArray(src.data), src.width, src.height), p=d.data, rot=fc.hue/360;
+    for(let j=0;j<p.length;j+=4){ if(!p[j+3]) continue; let r=p[j]/255,g=p[j+1]/255,b=p[j+2]/255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2; let h=0,s=0;
+      if(mx!==mn){ const dd=mx-mn; s=l>.5?dd/(2-mx-mn):dd/(mx+mn); h=mx===r?(g-b)/dd+(g<b?6:0):mx===g?(b-r)/dd+2:(r-g)/dd+4; h/=6; }
+      h=(h+rot)%1; const q=l<.5?l*(1+s):l+s-l*s, pp=2*l-q, f=t=>{ t=(t+1)%1; return t<1/6?pp+(q-pp)*6*t:t<.5?q:t<2/3?pp+(q-pp)*(2/3-t)*6:pp; };
+      p[j]=f(h+1/3)*255; p[j+1]=f(h)*255; p[j+2]=f(h-1/3)*255; }
+    const c=document.createElement("canvas"); c.width=src.width; c.height=src.height; c.getContext("2d").putImageData(d,0,0); FIRE_VAR[k]=c; });
+}
 const flick=(L,t)=>REDUCED_M?1:1+L.amp*(.55*Math.sin(t*7.3+L.ph)+.3*Math.sin(t*13.1+L.ph*2.3)+.15*Math.sin(t*23.7+L.ph*.7));
 const REDUCED_M = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -1501,7 +1520,9 @@ function render(now){
   const L=[];
   if(IMG.objetos) for(const sp of SC.sprites) if(sp.x<camX+VW&&sp.x+sp.w>camX&&sp.y<camY+VH&&sp.y+sp.h>camY)
     L.push({b:sp.base, d:()=>g.drawImage(IMG.objetos,sp.ax,sp.ay,sp.w,sp.h,sp.x-camX,sp.y-camY,sp.w,sp.h)});
-  if(IMG.fuego) for(const f of SC.fire){ const k=Math.floor(t*(REDUCED_M?0:9))%f.frames; L.push({b:f.base, d:()=>g.drawImage(IMG.fuego,k*32,0,32,44,f.x-camX,f.y-camY,32,44)}); }
+  const tint = now<fireTint.until ? fireTint.i : -1;
+  if(IMG.fuego && !FIRE_VAR.length) buildFireVariants();
+  if(IMG.fuego) for(const f of SC.fire){ const k=Math.floor(t*(REDUCED_M?0:9))%f.frames, src=tint>=0&&FIRE_VAR[tint]||IMG.fuego; L.push({b:f.base, d:()=>g.drawImage(src,k*32,0,32,44,f.x-camX,f.y-camY,32,44)}); }
   const chars = cast().map(c=>({...look(c), isMe:c.isMe})).concat(critters.map(c=>({...c.rec, fx:c.fx, fy:c.fy, dir:c.dir, moving:c.moving, critter:c.kind})));
   for(const c of chars){
     const X=Math.round(c.fx*TS+16-camX), Y=Math.round(c.fy*TS+28-camY);
@@ -1521,7 +1542,7 @@ function render(now){
   L.sort((a,b)=>a.b-b.b); for(const o of L) o.d();
   // luz cálida en tiempo real (las luces apagadas con B no cuentan)
   const img=g.getImageData(0,0,VW,VH), p=img.data; ADD.fill(0); let any=false;
-  for(const H of LIGHTS){ if(H.tx>=0 && "PL".includes(MAP[H.ty][H.tx]) && !isLit(H.tx,H.ty)) continue;
+  for(const H of LIGHTS){ if(H.tx>=0 && "PL".includes(MAP[H.ty][H.tx]) && !isLit(H.tx,H.ty)) continue; if(tint>=0 && H.amp===.22) continue;
     const ox=H.lx-H.rx-camX, oy=H.ly-H.ry-camY; if(ox>VW||oy>VH||ox+H.w<0||oy+H.h<0) continue; any=true; const f=flick(H,t);
     const x0=Math.max(0,ox), x1=Math.min(VW,ox+H.w), y0=Math.max(0,oy), y1=Math.min(VH,oy+H.h);
     for(let y=y0;y<y1;y++){ let mi=(y-oy)*H.w+(x0-ox), ai=y*VW+x0; for(let x=x0;x<x1;x++,mi++,ai++){ const v=H.m[mi]; if(v) ADD[ai]+=v*f; } } }
@@ -1529,6 +1550,9 @@ function render(now){
     p[j]=p[j]*(1+1.35*a)+58*a; p[j+1]=p[j+1]*(1+.38*a)+20*a; p[j+2]=p[j+2]*(1-.3*a); } g.putImageData(img,0,0); }
   // fuego fatuo y luciérnagas del lago
   g.globalCompositeOperation="lighter";
+  if(tint>=0) for(const f of SC.fire){ const [r,gg,b]=FIRE_COLORS[tint].glow, fx=f.x+16-camX, fy=f.y+34-camY, R=78*(1+.08*Math.sin(t*9));
+    const lg=g.createRadialGradient(fx,fy,0,fx,fy,R); lg.addColorStop(0,`rgba(${r},${gg},${b},.42)`); lg.addColorStop(.4,`rgba(${r},${gg},${b},.14)`); lg.addColorStop(1,`rgba(${r},${gg},${b},0)`);
+    g.fillStyle=lg; g.fillRect(fx-R,fy-R,R*2,R*2); }
   { const wx=wisp.fx*TS+16-camX, wy=wisp.fy*TS+12-camY+Math.sin(now/400)*3, r=46;
     const lg=g.createRadialGradient(wx,wy,0,wx,wy,r); lg.addColorStop(0,"rgba(140,255,230,.55)"); lg.addColorStop(.25,"rgba(80,220,200,.18)"); lg.addColorStop(1,"rgba(80,220,200,0)");
     g.fillStyle=lg; g.fillRect(wx-r,wy-r,r*2,r*2); g.fillStyle="#e8fff8"; g.fillRect(Math.round(wx-2),Math.round(wy-2),4,4); }
@@ -1743,7 +1767,9 @@ function pressB(){
       else if(a<b){ setCandy(candy-1); msg+="Pierdes un caramelo.\n'La casa siempre gana.\nY la casa es una tumba.'"; }
       else msg+="Empate. Nadie paga.\nEl esqueleto se ríe:\nclac clac clac.";
       return say("ESQUELETO", msg); }
-    if(pb==="cuervo"){ setCandy(candy-1); crowFedUntil=performance.now()+180000; return say("CUERVO", "Se lo traga entero.\nSe te acerca y susurra:\n\n"+gossip()+"\n\n(Ya no te robará\nen un buen rato.)"); }
+    if(pb==="cuervo"){ setCandy(candy-1); crowFedUntil=performance.now()+180000; return say("CUERVO", "Se te posa en el hombro\ny te susurra:\n\n"+gossip()); }
+    if(pb==="hoguera"){ setCandy(candy-1); const opts=FIRE_COLORS.map((_,i)=>i).filter(i=>i!==fireTint.i); const i=opts[Math.floor(Math.random()*opts.length)];
+      fireTint={i, until:performance.now()+40000}; return say("HOGUERA", "¡FSSSHHH!\n\nLas llamas se vuelven\n"+FIRE_COLORS[i].name+"."); }
   }
   const [dx,dy]=D[player.dir], tx=player.x+dx, ty=player.y+dy, t=tileAt(tx,ty);
   if(t==="b"){ const bn=benchAt(tx,ty); if(bn){ player.sit={cx:bn.x+23, top:bn.y, base:bn.base}; player.dir="down"; return; } }
@@ -1795,6 +1821,7 @@ function tombText(x,y){
 }
 const CANDY_SVG = `<svg class="ico" viewBox="0 0 12 8" aria-hidden="true" shape-rendering="crispEdges"><path fill="#081820" d="M0 1h2v1h1v1h1V2h4v1h1V2h1V1h2v6h-2V6H9V5H8v1H4V5H3v1H2v1H0z"/><path fill="#ff7ab0" d="M1 2h1v1h1v2H2v1H1z M10 2h1v4h-1V5H9V3h1z"/><path fill="#ff9a3c" d="M4 3h4v2H4z"/><path fill="#ffe08a" d="M4 3h2v1H4z"/></svg>`;
 function setCandy(n, sync=true){ const d=n-candy; candy=n; try{localStorage.setItem("hw-candy",candy)}catch(e){} updateCandy(); if(sync && d) call("halloween_candy",{p_delta:d>0?1:-1}); }
+function toastMsg(text, bad){ const t=document.createElement("div"); t.className="toast"+(bad?" steal":""); t.innerHTML=CANDY_SVG; const sp=document.createElement("span"); sp.textContent=text; t.appendChild(sp); $("#phone").appendChild(t); setTimeout(()=>t.remove(),1900); }
 function giveCandy(){
   setCandy(candy+1);
   const chip=$("#candy-chip"); chip.classList.remove("bump"); void chip.offsetWidth; chip.classList.add("bump");
@@ -1825,8 +1852,11 @@ function talkCritter(c){
   const ck="cr"+critters.indexOf(c);
   if(c.kind==="gato"){ const got=maybeCandy(ck,.6); return say("GATO", got?"¡Miau!\n(Te ha traído algo\nen la boca...)":["¡Miau!","Miau...","Prrrr. Miau."][Math.floor(Math.random()*3)], c.rec); }
   if(c.kind==="zombie") return say("ZOMBI", "Grrr... ¿un chiste?\n\n"+ZOMBIE_JOKES[Math.floor(Math.random()*ZOMBIE_JOKES.length)], c.rec);
-  if(c.kind==="cuervo"){ if(candy>0){ pendingB="cuervo"; return say("CUERVO", "¡Cra! (Te mira los\nbolsillos fijamente.)\n\nPulsa B para darle\nun caramelo.", c.rec); }
-    return say("CUERVO", ["¡Cra!","Cra. Cra.","(Te mira los\nbolsillos fijamente.)"][Math.floor(Math.random()*3)], c.rec); }
+  if(c.kind==="cuervo"){
+    if(candy<1) return say("CUERVO", "¡Cra! (Te registra los\nbolsillos, no encuentra\nnada y se ofende.)", c.rec);
+    setCandy(candy-1); toastMsg("¡EL CUERVO TE HA ROBADO!", true);
+    if(candy>0){ pendingB="cuervo"; return say("CUERVO", "¡Cra! Se lo traga entero.\n\nDame otro y te cuento\nun secreto de la fiesta.\n(Pulsa B para dárselo)", c.rec); }
+    return say("CUERVO", "¡Cra! Se lo traga entero.\n\nSi tuvieras otro, te\ncontaría un secreto...", c.rec); }
   if(c.kind==="sepulturero") return say("SEPULTURERO", gossip(), c.rec);
   if(c.kind==="esqueleto"){ const got=maybeCandy(ck,.7); if(got) return say("ESQUELETO", "Toma, a mí no me\nentra nada. Literal.", c.rec);
     if(candy>0 && Math.random()<.6){ pendingB="dados"; return say("ESQUELETO", "¿Nos jugamos un\ncaramelo a los dados?\nSi ganas, te doy dos.\n\nPulsa B para tirar.", c.rec); }
@@ -1876,7 +1906,9 @@ function interact(){
   if(t==="J") return openGramola();
   if(t==="K") return say("TUMBA DE LOS ANFITRIONES", "AQUÍ YACEN\nADRI E IRIS\n\nDescansarán en paz...\ncuando acabe la fiesta.");
   if(t==="S") return say("ESPANTAPÁJAROS", ["No espanto ni a\nlos cuervos. Mírame.","Si coges calabazas,\nyo no he visto nada.","Llevo aquí plantado\ntoda la noche."][Math.floor(Math.random()*3)]);
-  if(t==="H"){ const got=maybeCandy("hog",.5); return say("HOGUERA", got?"Entre las brasas hay\nun caramelo tostado.":"Huele a castañas\ny a humo. Qué gusto."); }
+  if(t==="H"){ const got=maybeCandy("hog",.35); if(got) return say("HOGUERA", "Entre las brasas hay\nun caramelo tostado.");
+    if(candy>0){ pendingB="hoguera"; return say("HOGUERA", "Huele a castañas.\nDicen que si echas un\ncaramelo, el fuego\ncambia de color...\n\nPulsa B para echarlo."); }
+    return say("HOGUERA", "Huele a castañas\ny a humo. Qué gusto."); }
   if(t==="b") return say("BANCO", (ty===14?"Alguien ha grabado:\n'A + I · 31·10'\n\n":"Un banco de piedra\npara descansar.\n\n")+"Pulsa B para sentarte.");
   if(t==="G") return say("FOSA", "Está recién cavada.\n¿Para quién será?");
   if(t==="W"||t==="w") return say("ESTANQUE", "El agua está quieta.\nDemasiado quieta.");
