@@ -241,6 +241,9 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .qrow .qt em{font-style:normal;color:#b0561a;white-space:nowrap}
 .qrow .opts{display:flex;gap:6px;flex-wrap:wrap}
 .qrow .qx{margin:0;font-size:6px;line-height:1.8;color:#6a5f88}
+.secret{display:flex;gap:12px;align-items:center;padding:10px 12px;background:#241a3e;border:3px solid var(--candle);font-size:7px;line-height:1.7;color:var(--paper)}
+.secret canvas{width:48px;height:21px;image-rendering:pixelated;flex:none}
+.secret b{display:block;font-weight:400;color:var(--candle);margin-bottom:2px}
 .qcheck{display:flex;align-items:center;gap:8px;font-size:8px;cursor:pointer;padding:6px 0 0}
 .qcheck input{width:18px;height:18px;margin:0;accent-color:var(--ink)}
 .qrow .opts button{font:8px var(--px);background:#fff;color:var(--ink);border:2px solid var(--ink);padding:8px 9px;cursor:pointer}
@@ -281,6 +284,11 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .steps li{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:8px;line-height:1.8}
 .steps b{font-weight:400;background:var(--ink);color:var(--candle-soft);text-align:center;height:20px;line-height:20px;font-size:8px}
 .intro-box .tbtn{margin-top:4px}
+.intro-box .tickets{display:block;text-align:center;text-decoration:none;background:#1ed760;color:#081820;font-size:9px}
+.ley{border:3px double #c2303a;color:#c2303a;text-align:center;padding:12px 10px 10px;transform:rotate(-2.5deg);display:grid;gap:6px;margin:6px 8px;background:rgba(194,48,58,.06)}
+.ley .ley-k{font-size:7px;letter-spacing:.14em}
+.ley p{margin:0;font-size:12px;line-height:1.4}
+.ley small{font-size:7px;line-height:1.6;color:#8a2a32}
 #t-info{margin:10px 0 calc(18px + env(safe-area-inset-bottom,0px));transition:opacity .35s}
 .tscreen.leaving .t-top,.tscreen.leaving .t-btns,.tscreen.leaving #t-info{opacity:0;pointer-events:none}
 .t-bad{font-size:9px;line-height:1.8;text-align:center;color:var(--paper);background:rgba(11,8,22,.85);padding:14px;margin:0;box-shadow:0 0 0 3px var(--ink)}
@@ -399,19 +407,15 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
     <div class="t-intro" id="t-intro" hidden role="dialog" aria-modal="true" aria-labelledby="intro-h">
       <div class="box intro-box">
         <h2 id="intro-h">¡ESTÁS INVITADO!</h2>
-        <dl class="info">
-          <dt>CUÁNDO</dt><dd>Sáb 31 oct · hora por confirmar</dd>
-          <dt>DÓNDE</dt><dd>Nuestra casa</dd>
-          <dt>DESPUÉS</dt><dd>Salimos de fiesta (sitio por anunciar)</dd>
-        </dl>
+        <dl class="info" id="intro-info"></dl>
+        <a class="pxbtn spot tickets" id="intro-tickets" target="_blank" rel="noopener" hidden>COMPRAR ENTRADAS ↗</a>
         <h2>CÓMO FUNCIONA</h2>
         <ol class="steps">
-          <li><b>1</b><span>De momento eres un fantasma, como todos los que aún no han respondido.</span></li>
-          <li><b>2</b><span>Confirma y elige tu personaje. Dejarás de ser un fantasma.</span></li>
-          <li><b>3</b><span>Entra al cementerio, muévete y toca a los demás para ver quién viene.</span></li>
-          <li><b>★</b><span>Cuanto más te apuntes, más cosas desbloqueas: accesorios si te vienes a la fiesta de después y un cubo de caramelos si te sumas al bote.</span></li>
-          <li><b>☠</b><span>Venir disfrazado es ley. No hay pregunta porque no hay opción.</span></li>
+          <li><b>1</b><span>Esta invitación es solo tuya. Hasta que respondas, eres un fantasma más vagando por el cementerio.</span></li>
+          <li><b>2</b><span>Confirma que vienes y resucitarás con tu propio aspecto.</span></li>
+          <li><b>3</b><span>Pasea, toca a los demás para ver quién viene y rebusca: hay caramelos escondidos por todas partes.</span></li>
         </ol>
+        <div class="ley" role="note"><span class="ley-k">LEY DEL CEMENTERIO</span><p>SE VIENE DISFRAZADO</p><small>No hay pregunta porque no hay opción.</small></div>
         <button class="tbtn primary" id="intro-ok" type="button"><i>▶</i><span><b>¡VAMOS!</b></span></button>
       </div>
     </div>
@@ -1534,6 +1538,18 @@ function capeGrid(g, dir, color){
 }
 const sprCache = new Map();
 const hatOn = r => !!accOf(r).cabeza;
+/* Secreto: quien dice que sí a todo (casa, fiesta de después y bote) lleva una mascota que le sigue */
+const allIn = r => !!r && confirmed(r) && !r.ghost && r.party==="si" && (r.bizum==="si"||r.bizum==="hecho");
+/* Mascota provisional (murciélago) hasta que llegue el diseño del chat de personajes */
+const PET_SPR = [
+  ["X..............X","XX....X..X....XX","XXX...XXXX...XXX",".XXXXXXXXXXXXXX.","..XXXXXEXEXXXX..","...XXXXXXXXXX...",".....X.XX.X....."],
+  ["......X..X......","......XXXX......","....XXXXXXXX....","..XXXXXEXEXXXX..",".XXXXXXXXXXXXXX.","XXX..XXXXXX..XXX","X.....X..X.....X"],
+].map(rows=>{ const c=document.createElement("canvas"); c.width=16; c.height=7; const x=c.getContext("2d");
+  rows.forEach((r,y)=>[...r].forEach((k,i)=>{ if(k===".") return; x.fillStyle = k==="E" ? "#ffd34a" : (y===0||i===0||i===15) ? "#1a1424" : "#3b2f52"; x.fillRect(i,y,1,1); })); return c; });
+const pet = {fx:14, fy:29, on:false, t:0};
+function drawPet(g, wx, wy, now, seed){ const fl=Math.floor(now/120+seed)%2, bob=Math.round(Math.sin(now/260+seed)*3);
+  g.fillStyle="rgba(6,6,14,.3)"; g.beginPath(); g.ellipse(wx, wy+18, 5, 1.5, 0, 0, 7); g.fill();
+  g.drawImage(PET_SPR[fl], Math.round(wx-8), Math.round(wy-6+bob)); }
 function avatarSprite(r, dir="down", frame=0, night=true){
   const ghost = !!(r.ghost || r.char==="fantasma");
   const A = ghost ? {} : accOf(r);
@@ -1711,6 +1727,9 @@ function render(now){
     L.push({b:Y+camY+3, d:()=>{ g.fillStyle="rgba(6,6,14,.42)"; g.beginPath(); g.ellipse(X, Y-1, ghost?8:9, ghost?2:3, 0, 0, 7); g.fill();
       g.globalAlpha = ghost ? .8 : c.attend==="quiza" ? .82 : 1; g.drawImage(spr, X-16, Y-spr.height+1-bob); g.globalAlpha=1; }});
   }
+  for(const c of chars){ if(c.critter || !allIn(c)) continue;
+    const [wx,wy] = c.isMe ? [pet.fx*TS+16, pet.fy*TS] : [c.fx*TS+34, c.fy*TS-2];
+    L.push({b:(c.isMe?pet.fy:c.fy)*TS+31, d:()=>drawPet(g, wx-camX, wy-camY, now, c.isMe?0:(c.fx*7+c.fy*3))}); }
   L.push({b:GATE.base, d:()=>drawGateW(g, camX, camY, now)});
   L.push({b:GRAMO.y*TS+30, d:()=>drawGramo(g, camX, camY, now)});
   L.sort((a,b)=>a.b-b.b); for(const o of L) o.d();
@@ -1801,6 +1820,11 @@ function advance(e, now, dur){
 }
 let lastPos={x:14,y:28}, moveTimer=0;
 function update(now){
+  { const dt=Math.min(.1,(now-(pet.t||now))/1000); pet.t=now;
+    if(mode==="play" && allIn(me)){ const [dx,dy]=D[player.dir]||[0,1];
+      if(!pet.on){ pet.on=true; pet.fx=player.fx-dx; pet.fy=player.fy-dy; }
+      const tx=player.fx-dx*.85+.35, ty=player.fy-dy*.85-.25, k=1-Math.exp(-dt*5);
+      pet.fx+=(tx-pet.fx)*k; pet.fy+=(ty-pet.fy)*k; } else pet.on=false; }
   if(now>(update.vt||0)){ update.vt=now+250; const d=Math.hypot(player.fx-GRAMO.x, player.fy-GRAMO.y); MUSIC.setVol(mode==="play" ? .45*(.35+.65*Math.max(0,1-d/14)) : .3); }
   if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
     advance(player, now, player.from&&player.from[1]===31&&player.y===28?900:170);
@@ -2281,6 +2305,19 @@ function buildTitle(){
     }
   }
 }
+/* Datos de la fiesta: cambiar aquí cuando estén cerrados */
+const FIESTA = {
+  cuando: "Sáb 31 oct · hora por confirmar",
+  donde: "Nuestra casa",
+  despues: "Salimos de fiesta (sitio por anunciar)",
+  entradas: "",   // enlace para comprar las entradas de la fiesta de después
+};
+function paintIntro(){
+  const dl=$("#intro-info"); dl.innerHTML="";
+  for(const [k,v] of [["CUÁNDO",FIESTA.cuando],["DÓNDE",FIESTA.donde],["DESPUÉS",FIESTA.despues]]){ const dt=document.createElement("dt"); dt.textContent=k; const dd=document.createElement("dd"); dd.textContent=v; dl.append(dt,dd); }
+  const t=$("#intro-tickets"); t.hidden=!FIESTA.entradas; if(FIESTA.entradas) t.href=FIESTA.entradas;
+}
+paintIntro();
 function showIntro(){ $("#t-intro").hidden=false; $("#intro-ok").focus(); }
 $("#t-info").onclick=showIntro;
 $("#intro-ok").onclick=()=>{ $("#t-intro").hidden=true; try{localStorage.setItem("hw-seen","1")}catch(e){} call("halloween_seen"); };
@@ -2503,6 +2540,10 @@ function buildProfile(){
     d.onclick=()=>{ if(on) openPicker(kind); else $("#err").textContent = `${label}: ${hint.toLowerCase()} para desbloquearlo.`; };
     sl.appendChild(d);
   }
+  { let sb=$("#secret"); if(!sb){ sb=document.createElement("div"); sb.id="secret"; sb.className="secret"; $("#slots").after(sb); }
+    const on=allIn({...draft, attend:draft.attend}); sb.hidden=!on;
+    if(on){ sb.innerHTML=""; const cv=document.createElement("canvas"); cv.width=32; cv.height=14; const x=cv.getContext("2d"); x.imageSmoothingEnabled=false; x.drawImage(PET_SPR[0],0,0,32,14);
+      const t=document.createElement("span"); t.innerHTML="<b>★ SECRETO DESBLOQUEADO</b>Por decir que sí a todo, una mascota te seguirá por el cementerio."; sb.append(cv,t); } }
   // preguntas
   const qs=$("#qs"); qs.innerHTML="";
   const REW = {attend:["char","PERSONAJE"], party:["hat","ACCESORIOS"], bizum:["hand","CUBO"]};
