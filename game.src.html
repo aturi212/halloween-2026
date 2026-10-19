@@ -41,6 +41,10 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .chip.menu:focus-visible{outline:2px solid #ffb455;outline-offset:5px}
 .burger{display:grid;gap:2px}.burger i{display:block;width:12px;height:2px;background:#ffe08a}
 .toast.steal{background:#ff9aa8}
+.area{position:absolute;left:50%;top:calc(150px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:7;font:10px var(--px);color:#e8dcff;background:rgba(20,12,40,.85);padding:10px 16px;box-shadow:0 0 0 3px #b48cff,0 0 24px rgba(180,140,255,.5);white-space:nowrap;pointer-events:none;text-align:center;line-height:1.8}
+.area small{display:block;font-size:6px;color:#b9a8e0}
+@media (prefers-reduced-motion:no-preference){.area{animation:areaIn 3.2s steps(10) forwards}}
+@keyframes areaIn{0%{opacity:0}12%{opacity:1}80%{opacity:1}100%{opacity:0}}
 .toast{position:absolute;left:50%;top:calc(96px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:7;display:flex;align-items:center;gap:8px;font:9px var(--px);color:#081820;background:#ffe08a;padding:8px 12px;box-shadow:0 0 0 3px #081820,4px 4px 0 3px rgba(0,0,0,.35);pointer-events:none}
 @media (prefers-reduced-motion:no-preference){.toast{animation:toast 1.6s steps(8) forwards}}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}15%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
@@ -222,9 +226,12 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .qrow .qt em{font-style:normal;color:#b0561a;white-space:nowrap}
 .qrow .opts{display:flex;gap:6px;flex-wrap:wrap}
 .qrow .qx{margin:0;font-size:6px;line-height:1.8;color:#6a5f88}
-.secret{display:flex;gap:12px;align-items:center;padding:10px 12px;background:#241a3e;border:3px solid var(--candle);font-size:7px;line-height:1.7;color:var(--paper)}
-.secret canvas{width:48px;height:21px;image-rendering:pixelated;flex:none}
+.secret{width:100%;text-align:left;font-family:var(--px);cursor:pointer;display:flex;gap:12px;align-items:center;padding:10px 12px;background:#241a3e;border:3px solid var(--candle);font-size:7px;line-height:1.7;color:var(--paper)}
+.secret canvas{width:48px;height:36px;image-rendering:pixelated;flex:none}
 .secret b{display:block;font-weight:400;color:var(--candle);margin-bottom:2px}
+.pet-name{grid-column:1/-1;display:grid;gap:6px;font-size:7px;color:#6a5f88}
+.pet-name input{font:10px var(--px);padding:8px;border:2px solid var(--ink);background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+.qbtn{display:block;text-align:center;text-decoration:none;font:8px var(--px);background:#1ed760;color:#081820;border:2px solid var(--ink);padding:8px 9px;margin-top:2px}
 .qcheck{display:flex;align-items:center;gap:8px;font-size:8px;cursor:pointer;padding:6px 0 0}
 .qcheck input{width:18px;height:18px;margin:0;accent-color:var(--ink)}
 .qrow .opts button{font:8px var(--px);background:#fff;color:var(--ink);border:2px solid var(--ink);padding:8px 9px;cursor:pointer}
@@ -396,7 +403,7 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
           <li><b>2</b><span>Confirma que vienes y resucitarás con tu propio aspecto.</span></li>
           <li><b>3</b><span>Pasea, toca a los demás para ver quién viene y rebusca: hay caramelos escondidos por todas partes.</span></li>
         </ol>
-        <div class="ley" role="note"><span class="ley-k">LEY DEL CEMENTERIO</span><p>EL 31 SE VIENE DISFRAZADO</p><small>A la fiesta de verdad, no en el juego. Sin disfraz no se cruza la verja.</small></div>
+        <div class="ley" role="note"><span class="ley-k">LEY DEL CEMENTERIO</span><p>EL 31 SE VIENE DISFRAZADO</p><small>A la fiesta de verdad, no en el juego. Sin disfraz no se cruza la verja. Y en la Oversize el mejor disfraz se lleva 100 €.</small></div>
         <button class="tbtn primary" id="intro-ok" type="button"><i>▶</i><span><b>¡VAMOS!</b></span></button>
       </div>
     </div>
@@ -1329,11 +1336,11 @@ const TXT = {attend:{si:"Viene a casa",quiza:"Quizá viene",no:"No puede venir"}
 
 /* Ejemplos, solo para ver el cementerio poblado (no son respuestas reales) */
 const DEMO = [
-  {id:"e1",nick:"Almaris",avatar:"almaris",attend:"si",party:"si",bizum:"hecho",hatStyle:3,handStyle:1,x:13,y:14},
+  {id:"e1",nick:"Almaris",avatar:"almaris",attend:"si",party:"si",bizum:"hecho",hatStyle:3,handStyle:1,petStyle:3,petName:"Morticia",x:13,y:14},
   {id:"e2",nick:"Muky",avatar:"muky",attend:"si",party:"no",bizum:"hecho",handStyle:2,x:16,y:14},
   {id:"e3",nick:"Inma",avatar:"inma",attend:"si",party:"si",bizum:"si",hatStyle:0,x:13,y:16},
   {id:"e4",nick:"Marina",avatar:"marina",attend:"quiza",party:"si",x:16,y:16},
-  {id:"e5",nick:"Fran",avatar:"fran",attend:"si",party:"si",bizum:"hecho",hatStyle:1,faceStyle:0,handStyle:0,x:12,y:13},
+  {id:"e5",nick:"Fran",avatar:"fran",attend:"si",party:"si",bizum:"hecho",hatStyle:1,faceStyle:0,handStyle:0,petStyle:4,x:12,y:13},
   {id:"e6",nick:"María",avatar:"maria",attend:"si",party:"si",bizum:"no",hatStyle:2,x:17,y:13},
   {id:"e7",nick:"Edu",x:16,y:8},{id:"e8",nick:"Nava",x:20,y:7},{id:"e9",nick:"Dani",x:7,y:12},{id:"e10",nick:"Bea",x:21,y:15},
 ];
@@ -1346,6 +1353,21 @@ let INVITE_NAME = "Adri";
    T lápida · C cruz · K tumba de los anfitriones · Y árbol · m setas · P calabaza · L farol · S espantapájaros
    N tablón · b banco · V pozo · H hoguera · G fosa */
 const SC = window.HW_SCENE, GEN = window.HW_GEN, LOOKS = window.HW_LOOKS || {};
+/* ===== EL CLARO DE LAS ÁNIMAS =====
+   Zona nueva al este, cruzando el puente por un hueco del seto. Ahí esperan los fantasmas (los que aún no han dicho que sí).
+   El suelo ya viene pintado en suelo.png (columnas 32-47); aquí se amplían el mapa y la rejilla de paso. */
+const CLARO = {
+  map:["FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFF.....FFFFF", "FFFFF.......FFFF", "FFFF...Z.Z...FFF", "FFF...........FF", "FFF.........Z.FF", "FFF....QQQ....FF", "====...QQQ.....F", "FFF....QQQ....FF", "FFF.........Z.FF", "FFF...........FF", "FFFF...Z.Z...FFF", "FFFFF.......FFFF", "FFFFFF.....FFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF"],
+  walk:["0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000001111100000", "0000011111110000", "0000111010111000", "0001111111111100", "0001111111110100", "0001111000111100", "1111111000111110", "0001111000111100", "0001111111110100", "0001111111111100", "0000111010111000", "0000011111110000", "0000001111100000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000"],
+  stones:[[39, 8], [39, 16], [41, 8], [41, 16], [44, 10], [44, 14]],
+  mush:[[41.86, 16.09], [45.8, 14.87], [39.97, 9.55], [43.62, 8.41], [44.0, 8.13], [41.79, 7.97], [36.78, 9.14], [40.83, 15.25], [45.19, 10.24], [38.64, 8.49], [37.91, 14.26], [38.36, 10.39], [44.27, 12.65], [38.08, 12.65]],
+  spots:[[36, 8], [37, 17], [41, 10], [40, 7], [38, 8], [37, 13], [45, 13], [44, 16], [40, 18], [40, 9], [42, 17], [38, 10], [38, 6], [40, 10], [36, 14], [38, 14], [35, 14], [38, 17], [44, 15], [42, 16], [44, 8], [44, 9], [38, 7], [36, 11], [45, 14], [43, 9], [37, 11], [43, 16], [39, 15], [42, 18], [43, 12], [45, 9], [42, 8], [41, 18], [37, 16], [41, 17], [36, 16], [35, 13], [43, 10], [35, 15]],
+  cx:40.5, cy:12.5, rx:6, ry:6.6,
+};
+SC.cols=48; SC.w=48*SC.T;
+SC.map=SC.map.map((r,y)=>{ const row=(r+" ".repeat(32)).slice(0,32).split(""); if(y===12) row[31]="="; return row.join("")+CLARO.map[y]; });
+SC.walk=SC.walk.map((r,y)=>{ const row=r.slice(0,32).split(""); if(y===12) row[31]="1"; return row.join("")+CLARO.walk[y]; });
+const inClaro = (x,y) => x>=33;
 const TS = SC.T, W = SC.cols, H = SC.rows;
 const MAP = SC.map.map(r => (r + " ".repeat(W)).slice(0, W).split(""));
 /* Bancos extra, pegados a los muros de piedra entre niveles (además de los dos de la fuente) */
@@ -1381,7 +1403,8 @@ let draft = me ? {...me} : {nick:INVITE_NAME,avatar:"adri",char:"base",color:"#6
 if(me && me.char!=="base"){ me.char="base"; me.color=me.color||"#6a4fb3"; }
 const player = {x:14,y:28,fx:14,fy:28,dir:"up",moving:false,t0:0,from:null,step:0};
 const mkNpc = d => ({...d, fx:d.x, fy:d.y, hx:d.x, hy:d.y, dir:d.dir||"down", moving:false, t0:0, from:null, step:0, next: performance.now()+1000+Math.random()*3000});
-const npcs = LIVE ? [] : DEMO.map(d => mkNpc({...d, demo:true}));
+const ghostSpot = i => CLARO.spots[i % CLARO.spots.length];
+const npcs = LIVE ? [] : DEMO.map((d,i) => { if(d.attend!=="si" && d.attend!=="no"){ const [x,y]=ghostSpot(i*3); d={...d,x,y}; } return mkNpc({...d, demo:true}); });
 let mode = "title";
 const unlit = new Set();
 const isLit = (x,y) => !unlit.has(x+","+y);
@@ -1521,16 +1544,67 @@ const sprCache = new Map();
 const hatOn = r => !!accOf(r).cabeza;
 /* Secreto: quien dice que sí a todo (casa, fiesta de después y bote) lleva una mascota que le sigue */
 const allIn = r => !!r && confirmed(r) && !r.ghost && r.party==="si" && (r.bizum==="si"||r.bizum==="hecho");
-/* Mascota provisional (murciélago) hasta que llegue el diseño del chat de personajes */
-const PET_SPR = [
-  ["X..............X","XX....X..X....XX","XXX...XXXX...XXX",".XXXXXXXXXXXXXX.","..XXXXXEXEXXXX..","...XXXXXXXXXX...",".....X.XX.X....."],
-  ["......X..X......","......XXXX......","....XXXXXXXX....","..XXXXXEXEXXXX..",".XXXXXXXXXXXXXX.","XXX..XXXXXX..XXX","X.....X..X.....X"],
-].map(rows=>{ const c=document.createElement("canvas"); c.width=16; c.height=7; const x=c.getContext("2d");
-  rows.forEach((r,y)=>[...r].forEach((k,i)=>{ if(k===".") return; x.fillStyle = k==="E" ? "#ffd34a" : (y===0||i===0||i===15) ? "#1a1424" : "#3b2f52"; x.fillRect(i,y,1,1); })); return c; });
-const pet = {fx:14, fy:29, on:false, t:0};
-function drawPet(g, wx, wy, now, seed){ const fl=Math.floor(now/120+seed)%2, bob=Math.round(Math.sin(now/260+seed)*3);
-  g.fillStyle="rgba(6,6,14,.3)"; g.beginPath(); g.ellipse(wx, wy+18, 5, 1.5, 0, 0, 7); g.fill();
-  g.drawImage(PET_SPR[fl], Math.round(wx-8), Math.round(wy-6+bob)); }
+/* Mascotas (diseño del chat de personajes). Todas siguen al personaje un poco por detrás y dan vueltas cerca;
+   los murcielaguitos ("mini") revolotean alrededor de la cabeza. */
+const PETS_DATA = {"pal":{"O":"#1d1520","w":"#4a3a68","B":"#6a5492","b":"#3a2a52","e":"#f2c84a","f":"#f6f2ea","W":"#ece6d8","S":"#b8b0a0","k":"#1d1520","p":"#ee9ab6","K":"#3e3850","y":"#f2c84a","g":"#f4f0fa","s":"#c8c0dc","q":"#f6c0d0","H":"#5a5272"},"murcielago":{"frente":[["O..............O","OwO..O....O..OwO","OwwO.OO..OO.OwwO","OwwwOBBBBBBOwwwO",".OwwOBeBBeBOwwO.","..OwOBBBBBBOwO..","...OOOBffBOOO...","......OBBO......",".......OO.......","................"],["................",".....O....O.....",".....OO..OO.....","....OBBBBBBO....","..OwOBeBBeBOwO..",".OwwOBBBBBBOwwO.","OwwwOOBffBOOwwwO","OwwO..OBBO..OwwO","OwO....OO....OwO","O..............O"]],"espalda":[["O..............O","OwO..O....O..OwO","OwwO.OO..OO.OwwO","OwwwOBBBBBBOwwwO",".OwwOBBBBBBOwwO.","..OwOBBBBBBOwO..","...OOOBBBBOOO...","......OBBO......",".......OO.......","................"],["................",".....O....O.....",".....OO..OO.....","....OBBBBBBO....","..OwOBBBBBBOwO..",".OwwOBBBBBBOwwO.","OwwwOOBBBBOOwwwO","OwwO..OBBO..OwwO","OwO....OO....OwO","O..............O"]]},"fantasma":{"frente":[["....OOOO....","..OOggggOO..",".OggggggggO.",".OggkggkggO.","OgggkggkgggO","OggqggggqggO","OggggkkggggO","OgggggggggsO","OggggggggssO","OggggggggssO","OggOgggOggsO",".OO.OOO.OOO."],["....OOOO....","..OOggggOO..",".OggggggggO.",".OggkggkggO.","OgggkggkgggO","OggqggggqggO","OggggkkggggO","OgggggggggsO","OggggggggssO","OggggggggssO","OgggOgggOgsO","O.OOO.OOO.O."]],"espalda":[["....OOOO....","..OOggggOO..",".OggggggggO.",".OggggggggO.","OggggggggggO","OggggggggggO","OggggggggggO","OgggggggggsO","OggggggggssO","OggggggggssO","OggOgggOggsO",".OO.OOO.OOO."],["....OOOO....","..OOggggOO..",".OggggggggO.",".OggggggggO.","OggggggggggO","OggggggggggO","OggggggggggO","OgggggggggsO","OggggggggssO","OggggggggssO","OgggOgggOgsO","O.OOO.OOO.O."]]},"perro":{"frente":[["....OOOOOO....","...OWWWWWWO...",".OOWWWWWWWWOO.","OWWOWWWWWWOWWO","OWOWkkWWkkWOWO",".OOWkkWWkkWOO.","...OWWkkWWO...","...OWWWWWWO...","....OSSSSO....","...OWOWWOWO...","...OWSWWSWO...","...OWOOOOWO...","...OWO..OWO...","...OWO..OWO...","...OO....OO..."],["....OOOOOO....","...OWWWWWWO...",".OOWWWWWWWWOO.","OWWOWWWWWWOWWO","OWOWkkWWkkWOWO",".OOWkkWWkkWOO.","...OWWkkWWO...","...OWWWWWWO...","....OSSSSO....","...OWOWWOWO...","...OWSWWSWO...","...OWOOOOWO...","...OWO..OWO...","...OO...OWO...","........OO...."],["....OOOOOO....","...OWWWWWWO...",".OOWWWWWWWWOO.","OWWOWWWWWWOWWO","OWOWkkWWkkWOWO",".OOWkkWWkkWOO.","...OWWkkWWO...","...OWWWWWWO...","....OSSSSO....","...OWOWWOWO...","...OWSWWSWO...","...OWOOOOWO...","...OWO..OWO...","...OWO...OO...","...OO........."]],"espalda":[["....OOOOOO....","...OWWWWWWO...",".OOWWWWWWWWOO.","OWWOWWWWWWOWWO","OWOWWWWWWWWOWO",".OOWSWWWWSWOO.","...OWSSSSWO...","....OOWWOO....","...OWOWWOWO...","...OWSWWSWO...","...OWOWWOWO...","...OWOOOOWO...","...OWO..OWO...","...OWO..OWO...","...OO....OO..."],["....OOOOOO....","...OWWWWWWO...",".OOWWWWWWWWOO.","OWWOWWWWWWOWWO","OWOWWWWWWWWOWO",".OOWSWWWWSWOO.","...OWSSSSWO...","....OOWWOO....","...OWOWWOWO...","...OWSWWSWO...","...OWOWWOWO...","...OWOOOOWO...","...OWO..OWO...","...OO...OWO...","........OO...."],["....OOOOOO....","...OWWWWWWO...",".OOWWWWWWWWOO.","OWWOWWWWWWOWWO","OWOWWWWWWWWOWO",".OOWSWWWWSWOO.","...OWSSSSWO...","....OOWWOO....","...OWOWWOWO...","...OWSWWSWO...","...OWOWWOWO...","...OWOOOOWO...","...OWO..OWO...","...OWO...OO...","...OO........."]],"lado":[["..............OO....",".............OWWO...","............OWWWWOO.","............OWWWWWWO","O...........OWkWWWWO","WO..........OWkWWWkO",".WO.........OWWWWWO.","..WO...OOOOOOWSSSO..","..OWOOOWOWOWOWWO....","...OWWSWSWSWSWO.....","...OWSWSWSWSWWO.....","...OWOOOOOOOOWO.....","...OWO......OWO.....","..OWO......OWO......","..OO.......OO......."],["..............OO....",".............OWWO...","............OWWWWOO.","............OWWWWWWO","............OWkWWWWO","OO..........OWkWWWkO",".WO.........OWWWWWO.","..WO...OOOOOOWSSSO..","..OWOOOWOWOWOWWO....","...OWWSWSWSWSWO.....","...OWSWSWSWSWWO.....","...OWOOOOOOOOWO.....","...OWO......OWO.....","....OWO......OWO....",".....OO.......OO...."]]},"gato":{"frente":[["..O........O..","..OKO....OKO..","..OKpOOOOpKO..","..OKKKKKKKKO..","..OKyKKKKyKO..","..OKKKppKKKO..","...OKKKKKKO...","....OKKKKO....","...OKKKKKKO...","...OKKHHKKO...","...OKKKKKKO...","...OKOOOOKO...","...OKO..OKO...","...OKO..OKO...","...OO....OO..."],["..O........O..","..OKO....OKO..","..OKpOOOOpKO..","..OKKKKKKKKO..","..OKyKKKKyKO..","..OKKKppKKKO..","...OKKKKKKO...","....OKKKKO....","...OKKKKKKO...","...OKKHHKKO...","...OKKKKKKO...","...OKOOOOKO...","...OKO..OKO...","...OO...OKO...","........OO...."],["..O........O..","..OKO....OKO..","..OKpOOOOpKO..","..OKKKKKKKKO..","..OKyKKKKyKO..","..OKKKppKKKO..","...OKKKKKKO...","....OKKKKO....","...OKKKKKKO...","...OKKHHKKO...","...OKKKKKKO...","...OKOOOOKO...","...OKO..OKO...","...OKO...OO...","...OO........."]],"espalda":[["..O........O..","..OKO....OKO..","..OKKOOOOKKO..","..OKKKKKKKKO..","..OKHKKKKHKO..","..OKKKKKKKKO..","...OKKKKKKO.O.","....OKKKKO.OKO","...OKKKKKKOKO.","...OKHKKHKKO..","...OKKKKKKO...","...OKOOOOKO...","...OKO..OKO...","...OKO..OKO...","...OO....OO..."],["..O........O..","..OKO....OKO..","..OKKOOOOKKO..","..OKKKKKKKKO..","..OKHKKKKHKO..","..OKKKKKKKKO..","...OKKKKKKO.O.","....OKKKKO.OKO","...OKKKKKKOKO.","...OKHKKHKKO..","...OKKKKKKO...","...OKOOOOKO...","...OKO..OKO...","...OO...OKO...","........OO...."],["..O........O..","..OKO....OKO..","..OKKOOOOKKO..","..OKKKKKKKKO..","..OKHKKKKHKO..","..OKKKKKKKKO..","...OKKKKKKO.O.","....OKKKKO.OKO","...OKKKKKKOKO.","...OKHKKHKKO..","...OKKKKKKO...","...OKOOOOKO...","...OKO..OKO...","...OKO...OO...","...OO........."]],"lado":[["..............O.O...",".............OKOKO..","..O..........OKKKKO.",".OKO.........OKKyKKO",".OKO.........OKKKKpO","..OKO........OKKKKO.","..OKO...OOOOOKKKKO..","...OKOOOKHHHHKKKO...","....OKKKKKKKKKKKO...","....OKKKKKKKKKKKO...","....OKKOOOOOOKKO....","....OKO......OKO....","...OKO......OKO.....","...OO.......OO......"],["..............O.O...",".............OKOKO..",".O...........OKKKKO.","OKO..........OKKyKKO",".OKO.........OKKKKpO","..OKO........OKKKKO.","..OKO...OOOOOKKKKO..","...OKOOOKHHHHKKKO...","....OKKKKKKKKKKKO...","....OKKKKKKKKKKKO...","....OKKOOOOOOKKO....","....OKO......OKO....",".....OKO......OKO...",".....OO.......OO...."]]},"mini":{"frente":[["O..O.O..O","OwOBBBOwO",".OOBeBOO.","...OBO..."],["...O.O...",".OOBBBOO.","OwOBeBOwO","O..OBO..O"]],"espalda":[["O..O.O..O","OwOBBBOwO",".OOBBBOO.","...OBO..."],["...O.O...",".OOBBBOO.","OwOBBBOwO","O..OBO..O"]]}};
+const PET_LIST = [["murcielago","MURCIÉLAGO"],["fantasma","FANTASMITA"],["perro","PERRITO"],["gato","GATITO"],["mini","MURCIELAGUITOS"]];
+const PET_KIND = {murcielago:"vuela", fantasma:"vuela", perro:"suelo", gato:"suelo", mini:"orbita"};
+const petOf = r => PET_LIST[Math.max(0,Math.min(4,nz(r&&r.petStyle,0)))][0];
+const petCache = new Map();
+function petCanvas(kind, view, f, night=true){
+  const key=[kind,view,f,night?1:0].join("|"); let c=petCache.get(key); if(c) return c;
+  const P=PETS_DATA[kind], flip=view==="izq"; let v=(view==="izq"||view==="der")?"lado":view; if(!P[v]) v="frente";
+  const frames=P[v], seq=(PET_KIND[kind]==="suelo"&&v!=="lado")?[0,1,0,2]:[0,1], rows=frames[seq[f%seq.length]%frames.length];
+  c=document.createElement("canvas"); c.width=rows[0].length; c.height=rows.length; const x=c.getContext("2d");
+  rows.forEach((r,y)=>[...r].forEach((k,i)=>{ if(k===".") return; let [R,G,B]=hexRGB(PETS_DATA.pal[k]||"#ff00ff");
+    if(night){ R*=NIGHTK[0]; G*=NIGHTK[1]; B=Math.min(255,B*NIGHTK[2]+NIGHTK[3]); }
+    x.fillStyle=`rgb(${R|0},${G|0},${B|0})`; x.fillRect(flip?rows[0].length-1-i:i,y,1,1); }));
+  petCache.set(key,c); return c;
+}
+/* estado de la mascota del jugador (en píxeles del mundo) */
+const pet = {x:0, y:0, on:false, t:0, vx:0, vy:0, view:"frente", moving:false, wt:0, ox:12, oy:6, idle:0};
+function petTarget(now){
+  const ax=player.fx*TS+16, ay=player.fy*TS+28, [dx,dy]=D[player.dir]||[0,1], kind=petOf(me);
+  if(player.moving||held) pet.idle=now;
+  const idle = now-pet.idle > 1200;
+  if(idle && now>pet.wt){ pet.wt=now+1800+Math.random()*1600; pet.ox=(Math.random()<.5?-1:1)*(15+Math.random()*12); pet.oy=Math.random()*16-3; }
+  if(PET_KIND[kind]==="vuela"){ if(idle){ const a=now/1300; return [ax+Math.cos(a)*22, ay-26+Math.sin(a)*8]; } return [ax-dx*20+8, ay-dy*14-26]; }
+  if(idle) return [ax+pet.ox, ay+pet.oy];
+  return [ax-dx*22+(dy?10:0), ay-dy*20+(dx?4:0)];
+}
+function updatePet(now){
+  const dt=Math.min(.1,(now-(pet.t||now))/1000); pet.t=now;
+  if(!(mode==="play" && allIn(me))){ pet.on=false; return; }
+  const [tx,ty]=petTarget(now);
+  if(!pet.on){ pet.on=true; pet.x=tx; pet.y=ty; pet.idle=now; }
+  const k=1-Math.exp(-dt*(PET_KIND[petOf(me)]==="vuela"?3.5:5)), nx=pet.x+(tx-pet.x)*k, ny=pet.y+(ty-pet.y)*k;
+  pet.vx=nx-pet.x; pet.vy=ny-pet.y; pet.x=nx; pet.y=ny;
+  const sp=Math.hypot(pet.vx,pet.vy); pet.moving = sp>.25;
+  if(pet.moving) pet.view = Math.abs(pet.vx)>Math.abs(pet.vy) ? (pet.vx>0?"der":"izq") : (pet.vy<0?"espalda":"frente");
+  else if(PET_KIND[petOf(me)]!=="vuela") pet.view="frente";
+}
+/* dibuja la mascota de c: los del jugador en su posición; los de otros, quietos a su lado */
+function pushPet(L, g, c, camX, camY, now){
+  const kind=petOf(c), seed=c.isMe?0:((c.fx*7+c.fy*3)|0), ax=c.fx*TS+16, ay=c.fy*TS+28;
+  if(PET_KIND[kind]==="orbita"){
+    for(let k=0;k<2;k++){ const a=now/520+k*Math.PI+seed, ox=Math.cos(a)*11, oy=Math.sin(a)*3, front=Math.sin(a)>0;
+      const spr=petCanvas("mini", front?"frente":"espalda", Math.floor(now/110+k)%2);
+      const top = ay-(hatOn(c)?54:44);
+      L.push({b:ay+3+(front?1:-1), d:()=>g.drawImage(spr, Math.round(ax+ox-4-camX), Math.round(top+oy-camY))}); }
+    return;
+  }
+  let x,y,view,f;
+  if(c.isMe){ x=pet.x; y=pet.y; view=pet.view; f = PET_KIND[kind]==="vuela" ? Math.floor(now/140)%2 : pet.moving ? Math.floor(now/120)%4 : 0; }
+  else if(PET_KIND[kind]==="vuela"){ const a=now/1300+seed; x=ax+Math.cos(a)*20; y=ay-26+Math.sin(a)*7; view="frente"; f=Math.floor(now/140+seed)%2; }
+  else { x=ax+18; y=ay+2; view="frente"; f=0; }
+  const spr=petCanvas(kind, view, f);
+  if(PET_KIND[kind]==="vuela"){ const bob=Math.round(Math.sin(now/260+seed)*2), gy=y+26;
+    L.push({b:gy+2, d:()=>{ g.fillStyle="rgba(6,6,14,.3)"; g.beginPath(); g.ellipse(x-camX, gy-camY, 5, 1.5, 0, 0, 7); g.fill();
+      g.drawImage(spr, Math.round(x-spr.width/2-camX), Math.round(y-spr.height/2+bob-camY)); }}); }
+  else L.push({b:y+2, d:()=>{ g.fillStyle="rgba(6,6,14,.35)"; g.beginPath(); g.ellipse(x-camX, y-1-camY, 6, 2, 0, 0, 7); g.fill();
+      g.drawImage(spr, Math.round(x-spr.width/2-camX), Math.round(y-spr.height-camY)); }});
+  if(c.isMe) c._pet={x, y: PET_KIND[kind]==="vuela" ? y-12 : y-spr.height-4};
+}
 function avatarSprite(r, dir="down", frame=0, night=true){
   const ghost = !!(r.ghost || r.char==="fantasma");
   const A = ghost ? {} : accOf(r);
@@ -1643,6 +1717,21 @@ const GRAMO_SPR = [0,1,2,3].map(fr=>{
   return c;
 });
 const gramoNotes=[]; let gramoNextNote=0;
+/* Menhires del claro (dos tamaños) y setas que brillan */
+const RUNES = [[[9,12],[10,12],[11,12],[10,13],[10,14],[9,15],[11,15]],[[8,14],[9,15],[10,16],[11,15],[12,14],[10,17],[10,18]]];
+const MENHIR_SPR = [40,34].map((h,k)=>{
+  const c=document.createElement("canvas"); c.width=22; c.height=h+4; const x=c.getContext("2d");
+  const P=(px,py,w,hh,col)=>{ x.fillStyle=col; x.fillRect(px,py,w,hh); };
+  P(3,h+1,16,3,"rgba(4,4,12,.45)");
+  for(let y=0;y<h+2;y++){ const t=y/(h+2), half=Math.round(5+3.2*Math.sin(Math.min(1,t*1.6)*Math.PI/2)+(k?.5:0)), cx=11+(k&&y<6?1:0);
+    P(cx-half-1,y,half*2+2,1,"#141020"); if(y>0&&y<h+1){ P(cx-half,y,half*2,1,"#4a4664"); P(cx-half,y,3,1,"#625e80"); P(cx+half-3,y,3,1,"#34304a"); } }
+  P(7,3,2,6,"#6e6a8c"); P(14,h-8,3,4,"#2c283e");
+  RUNES[k].forEach(([rx,ry])=>P(rx,ry+(k?0:2),1,1,"#2a2040"));
+  return c;
+});
+const MUSH_SPR = (()=>{ const c=document.createElement("canvas"); c.width=7; c.height=6; const x=c.getContext("2d");
+  [["..ccc..",".cCCCc.","cCCwCCc","...s...","...s..."]].forEach(rows=>rows.forEach((r,y)=>[...r].forEach((k,i)=>{ if(k===".")return; x.fillStyle={c:"#1c6f86",C:"#5fe0f0",w:"#e8ffff",s:"#a9b8c8"}[k]; x.fillRect(i,y,1,1); })));
+  return c; })();
 function drawGramo(g, camX, camY, now){
   const X=GRAMO.x*TS-4-camX, Y=GRAMO.y*TS+31-52-camY, on=MUSIC.playing;
   g.drawImage(GRAMO_SPR[on?Math.floor(now/140)%4:0], X, Y);
@@ -1708,11 +1797,12 @@ function render(now){
     L.push({b:Y+camY+3, d:()=>{ g.fillStyle="rgba(6,6,14,.42)"; g.beginPath(); g.ellipse(X, Y-1, ghost?8:9, ghost?2:3, 0, 0, 7); g.fill();
       g.globalAlpha = ghost ? .8 : c.attend==="quiza" ? .82 : 1; g.drawImage(spr, X-16, Y-spr.height+1-bob); g.globalAlpha=1; }});
   }
-  for(const c of chars){ if(c.critter || !allIn(c)) continue;
-    const [wx,wy] = c.isMe ? [pet.fx*TS+16, pet.fy*TS] : [c.fx*TS+34, c.fy*TS-2];
-    L.push({b:(c.isMe?pet.fy:c.fy)*TS+31, d:()=>drawPet(g, wx-camX, wy-camY, now, c.isMe?0:(c.fx*7+c.fy*3))}); }
+  for(const c of chars){ if(c.critter || !allIn(c) || (c.isMe && player.sit && PET_KIND[petOf(c)]!=="orbita")) continue; pushPet(L, g, c, camX, camY, now); }
   L.push({b:GATE.base, d:()=>drawGateW(g, camX, camY, now)});
   L.push({b:GRAMO.y*TS+30, d:()=>drawGramo(g, camX, camY, now)});
+  if(camX+VW > 32*TS){
+    CLARO.stones.forEach(([sx,sy],k)=>{ const spr=MENHIR_SPR[k%2]; L.push({b:sy*TS+30, d:()=>g.drawImage(spr, sx*TS+5-camX, sy*TS+30-spr.height+3-camY)}); });
+    for(const [mx,my] of CLARO.mush) L.push({b:my*TS, d:()=>g.drawImage(MUSH_SPR, Math.round(mx*TS-camX), Math.round(my*TS-camY))}); }
   L.sort((a,b)=>a.b-b.b); for(const o of L) o.d();
   // luz cálida en tiempo real (las luces apagadas con B no cuentan)
   const img=g.getImageData(0,0,VW,VH), p=img.data; ADD.fill(0); let any=false;
@@ -1724,6 +1814,19 @@ function render(now){
     p[j]=p[j]*(1+1.35*a)+58*a; p[j+1]=p[j+1]*(1+.38*a)+20*a; p[j+2]=p[j+2]*(1-.3*a); } g.putImageData(img,0,0); }
   // fuego fatuo y luciérnagas del lago
   g.globalCompositeOperation="lighter";
+  if(camX+VW > 30*TS){ // luz fría y mágica del claro
+    const glow=(x,y,r,col,a)=>{ const lg=g.createRadialGradient(x,y,0,x,y,r); lg.addColorStop(0,`rgba(${col},${a})`); lg.addColorStop(1,`rgba(${col},0)`); g.fillStyle=lg; g.fillRect(x-r,y-r,r*2,r*2); };
+    glow(CLARO.cx*TS-camX, CLARO.cy*TS+4-camY, 90, "90,200,255", .16+.04*Math.sin(t*1.3));
+    CLARO.stones.forEach(([sx,sy],k)=>{ const pulse=.5+.5*Math.sin(t*1.7+k*1.3); glow(sx*TS+16-camX, sy*TS+30-MENHIR_SPR[k%2].height+20-camY, 22, "190,120,255", .18+.3*pulse);
+      if(pulse>.2){ g.fillStyle=`rgba(220,170,255,${.35+.6*pulse})`; RUNES[k%2].forEach(([rx,ry])=>g.fillRect(sx*TS+5+rx-camX, sy*TS+30-MENHIR_SPR[k%2].height+3+ry+(k%2?0:2)-camY,1,1)); } });
+    CLARO.mush.forEach(([mx,my],k)=>glow(mx*TS+3-camX, my*TS+2-camY, 14, "110,230,255", .22+.1*Math.sin(t*2+k)));
+    for(let i=0;i<22;i++){ const a=t*.25+i*2.39, rr=(i%7)*.8+1.2;
+      const fx=(CLARO.cx+Math.cos(a+i)*rr*1.1+Math.sin(t*.7+i)*.4)*TS-camX, fy=(CLARO.cy+Math.sin(a*1.3+i)*rr+Math.cos(t*.5+i)*.3)*TS-camY;
+      if(Math.sin(t*2+i*1.7)<-.4) continue; g.fillStyle=i%3?"rgba(200,150,255,.9)":"rgba(140,240,255,.9)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); }
+    for(let i=0;i<3;i++){ // pista sutil: lucecitas en el hueco del seto
+      const fx=(31.2+i*.5+Math.sin(t*.8+i*2)*.4)*TS-camX, fy=(11.9+Math.sin(t*1.1+i)*.5+i*.15)*TS-camY;
+      if(Math.sin(t*1.5+i*2.1)>-.2){ glow(fx,fy,9,"190,140,255",.35); g.fillStyle="rgba(230,200,255,.95)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); } }
+  }
   if(tint>=0) for(const f of SC.fire){ const [r,gg,b]=FIRE_COLORS[tint].glow, fx=f.x+16-camX, fy=f.y+34-camY, R=78*(1+.08*Math.sin(t*9));
     const lg=g.createRadialGradient(fx,fy,0,fx,fy,R); lg.addColorStop(0,`rgba(${r},${gg},${b},.42)`); lg.addColorStop(.4,`rgba(${r},${gg},${b},.14)`); lg.addColorStop(1,`rgba(${r},${gg},${b},0)`);
     g.fillStyle=lg; g.fillRect(fx-R,fy-R,R*2,R*2); }
@@ -1734,6 +1837,10 @@ function render(now){
   for(let i=0;i<12;i++){ if(Math.sin(now/300+i*3)<-.3) continue;
     const fx=21.5*TS+((i*53)%230)+Math.sin(now/900+i)*14-camX, fy=9.3*TS+((i*37)%190)+Math.cos(now/700+i*2)*10-camY;
     g.fillStyle="rgba(255,240,140,.9)"; g.fillRect(Math.round(fx),Math.round(fy),2,2); }
+  if(camX+VW > 32*TS){ // niebla que se arrastra por el claro
+    g.globalCompositeOperation="source-over";
+    for(let i=0;i<7;i++){ const fx=((i*3.1+t*.06*(i%2?1:-1))%1+1)%1, X=(34+fx*13)*TS-camX, Y=(6.5+((i*.37)%1)*12+Math.sin(t*.2+i)*.6)*TS-camY, R=70+20*(i%3);
+      const lg=g.createRadialGradient(X,Y,0,X,Y,R); lg.addColorStop(0,"rgba(190,180,230,.10)"); lg.addColorStop(1,"rgba(190,180,230,0)"); g.fillStyle=lg; g.fillRect(X-R,Y-R*.6,R*2,R*1.2); } }
   g.globalCompositeOperation="multiply"; g.drawImage(vig,0,0); g.globalCompositeOperation="source-over";
   // a pantalla
   ctx.imageSmoothingEnabled=false; ctx.fillStyle="#05070c"; ctx.fillRect(0,0,cw,ch);
@@ -1750,6 +1857,10 @@ function render(now){
     ctx.fillStyle = c.isMe ? "#17122a" : "#f3ead8";
     ctx.fillText(label, sx, sy);
   }
+  { const me2=chars.find(c=>c.isMe); if(me2 && me2._pet && me && me.petName && now-pet.idle>1500){
+      ctx.font = `${Math.max(6, Math.round(T/6.5))}px "Press Start 2P", monospace`;
+      const label=me.petName.toUpperCase(), sx=(me2._pet.x-camX)*K, sy=(me2._pet.y-camY)*K, w=ctx.measureText(label).width+6*dpr;
+      ctx.fillStyle="rgba(42,30,70,.85)"; ctx.fillRect(sx-w/2, sy-T/6.5-5*dpr, w, T/6.5+7*dpr); ctx.fillStyle="#e8dcff"; ctx.fillText(label, sx, sy); } }
   // flechas hacia invitados fuera de pantalla
   if(mode==="play"){
     const top=90*dpr, bot=ch-210*dpr, m=18*dpr;
@@ -1800,12 +1911,11 @@ function advance(e, now, dur){
   if(k>=1){ e.moving=false; e.fx=e.x; e.fy=e.y; }
 }
 let lastPos={x:14,y:28}, moveTimer=0;
+let inClaroNow=false;
+function areaBanner(){ const t=document.createElement("div"); t.className="area"; t.innerHTML="EL CLARO DE LAS ÁNIMAS<small>donde esperan los que aún no se deciden</small>"; $("#phone").appendChild(t); setTimeout(()=>t.remove(),3300); }
 function update(now){
-  { const dt=Math.min(.1,(now-(pet.t||now))/1000); pet.t=now;
-    if(mode==="play" && allIn(me)){ const [dx,dy]=D[player.dir]||[0,1];
-      if(!pet.on){ pet.on=true; pet.fx=player.fx-dx; pet.fy=player.fy-dy; }
-      const tx=player.fx-dx*.85+.35, ty=player.fy-dy*.85-.25, k=1-Math.exp(-dt*5);
-      pet.fx+=(tx-pet.fx)*k; pet.fy+=(ty-pet.fy)*k; } else pet.on=false; }
+  if(mode==="play"){ const ic=inClaro(player.x,player.y); if(ic&&!inClaroNow) areaBanner(); inClaroNow=ic; }
+  updatePet(now);
   if(now>(update.vt||0)){ update.vt=now+250; const d=Math.hypot(player.fx-GRAMO.x, player.fy-GRAMO.y); MUSIC.setVol(mode==="play" ? .45*(.35+.65*Math.max(0,1-d/14)) : .3); }
   if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
     advance(player, now, player.from&&player.from[1]===31&&player.y===28?900:170);
@@ -2098,6 +2208,9 @@ function interact(){
     if(candy<1) return say("POZO DE LOS DESEOS", "Necesitas un caramelo\npara pedir un deseo.");
     pendingB="pozo"; return say("POZO DE LOS DESEOS", "¿Echas un caramelo\npara conocer tu futuro?\n\nPulsa B para echarlo.");
   }
+  if(t==="Q"){ const ghosts=npcs.filter(n=>!confirmed(n)&&n.attend!=="no").map(n=>n.nick);
+    return say("ESTANQUE DE LAS ÁNIMAS", ghosts.length ? "En el agua se reflejan\nlos que aún no han dicho\nque sí:\n\n"+ghosts.slice(0,8).join(", ")+(ghosts.length>8?"...":"") : "El agua está en calma.\nNo queda nadie por\ndecidirse. Qué bien."); }
+  if(t==="Z") return say("MENHIR", ["Unas runas brillan y\nse apagan, como si\nrespiraran.","Pone algo en un idioma\nmuy antiguo. Parece\nuna lista de invitados.","La piedra está tibia.\nAlguien ha estado\nesperando aquí mucho\ntiempo."][Math.floor(Math.random()*3)]);
   if(t==="O"){ const got=maybeCandy("fuente",.6); return say("FUENTE", got?"En el fondo brilla algo...\n¡un caramelo!":"El agua susurra nombres\nque no conoces."); }
   if(t==="R"||t==="r") return say("ROCA","Una roca con musgo.\nMuy roca, la verdad.");
   if(t==="Y" && tx===NEST.x && ty===NEST.y){
@@ -2230,6 +2343,7 @@ function showGuest(c){
       : c.isMe ? "Aún eres un fantasma.\nConfirma para tener\ntu personaje." : "Todavía no ha respondido.\nSigue vagando como\nfantasma...", look(c));
   }
   const lines = [TXT.attend[c.attend], c.party?TXT.party[c.party]:""].filter(Boolean);
+  if(allIn(c)) lines.push(c.petName ? `Le acompaña ${c.petName}.` : "Le sigue una mascota.");
   say((c.isMe?"TÚ · ":"") + (c.nick||"?").toUpperCase() + (c.demo?" (ejemplo)":""), lines.join("\n"), c);
 }
 function cast(){
@@ -2288,14 +2402,15 @@ function buildTitle(){
 }
 /* Datos de la fiesta: cambiar aquí cuando estén cerrados */
 const FIESTA = {
-  cuando: "Sáb 31 oct · hora por confirmar",
+  cuando: "Sáb 31 oct · 22:30–23:00",
   donde: "Nuestra casa",
-  despues: "Salimos de fiesta (sitio por anunciar)",
-  entradas: "",   // enlace para comprar las entradas de la fiesta de después
+  despues: "Oversize · Child's Play (5º aniversario). Sala Galileo Galilei, C/ Galileo 100. Puertas a las 00:00, hasta las 6:00",
+  entrada: "20–22 € con copa (válida hasta la 1:30) · +18",
+  entradas: "https://site.fourvenues.com/es/oversize-collective/events/oversize-presenta-childs-play-5-aniversario-31-10-2026-OEI2",
 };
 function paintIntro(){
   const dl=$("#intro-info"); dl.innerHTML="";
-  for(const [k,v] of [["CUÁNDO",FIESTA.cuando],["DÓNDE",FIESTA.donde],["DESPUÉS",FIESTA.despues]]){ const dt=document.createElement("dt"); dt.textContent=k; const dd=document.createElement("dd"); dd.textContent=v; dl.append(dt,dd); }
+  for(const [k,v] of [["CUÁNDO",FIESTA.cuando],["DÓNDE",FIESTA.donde],["DESPUÉS",FIESTA.despues],["ENTRADA",FIESTA.entrada]]){ const dt=document.createElement("dt"); dt.textContent=k; const dd=document.createElement("dd"); dd.textContent=v; dl.append(dt,dd); }
   const t=$("#intro-tickets"); t.hidden=!FIESTA.entradas; if(FIESTA.entradas) t.href=FIESTA.entradas;
 }
 paintIntro();
@@ -2486,6 +2601,26 @@ function openPicker(kind, msg){
   });
   $("#picker").hidden=false;
 }
+function openPetPicker(){
+  $("#pk-h").textContent="TU MASCOTA"; $("#pk-candy").textContent=candy;
+  $("#pk-msg").textContent="Elige quién te acompaña y ponle nombre.";
+  const grid=$("#pk-grid"); grid.innerHTML="";
+  const nb=document.createElement("label"); nb.className="pet-name"; nb.innerHTML="<span>NOMBRE</span>";
+  const inp=document.createElement("input"); inp.type="text"; inp.maxLength=14; inp.placeholder="Sin nombre"; inp.value=draft.petName||"";
+  inp.addEventListener("input",()=>{ draft.petName=inp.value; buildProfile(); }); nb.appendChild(inp);
+  PET_LIST.forEach(([kind,label],idx)=>{
+    const b=document.createElement("button"); b.type="button"; b.setAttribute("aria-pressed", nz(draft.petStyle,0)===idx);
+    const cv=document.createElement("canvas"); cv.width=32; cv.height=32; const x=cv.getContext("2d"); x.imageSmoothingEnabled=false;
+    const spr=petCanvas(kind,"frente",0,false), sc=Math.min(2,Math.floor(28/Math.max(spr.width,spr.height))||1);
+    if(kind==="mini"){ x.drawImage(spr,2,10,spr.width*sc,spr.height*sc); x.drawImage(spr,14,18,spr.width*sc,spr.height*sc); }
+    else x.drawImage(spr,(32-spr.width*sc)/2,(32-spr.height*sc)/2,spr.width*sc,spr.height*sc);
+    const name=document.createElement("span"); name.textContent=label; b.append(cv,name);
+    b.onclick=()=>{ draft.petStyle=idx; buildProfile(); openPetPicker(); };
+    grid.appendChild(b);
+  });
+  grid.appendChild(nb);
+  $("#picker").hidden=false;
+}
 $("#pk-close").onclick=()=>{ $("#picker").hidden=true; };
 let slotState={};
 function openProfile(){
@@ -2521,10 +2656,14 @@ function buildProfile(){
     d.onclick=()=>{ if(on) openPicker(kind); else $("#err").textContent = `${label}: ${hint.toLowerCase()} para desbloquearlo.`; };
     sl.appendChild(d);
   }
-  { let sb=$("#secret"); if(!sb){ sb=document.createElement("div"); sb.id="secret"; sb.className="secret"; $("#slots").after(sb); }
+  { let sb=$("#secret"); if(!sb){ sb=document.createElement("button"); sb.type="button"; sb.id="secret"; sb.className="secret"; $("#slots").after(sb); }
     const on=allIn({...draft, attend:draft.attend}); sb.hidden=!on;
-    if(on){ sb.innerHTML=""; const cv=document.createElement("canvas"); cv.width=32; cv.height=14; const x=cv.getContext("2d"); x.imageSmoothingEnabled=false; x.drawImage(PET_SPR[0],0,0,32,14);
-      const t=document.createElement("span"); t.innerHTML="<b>★ SECRETO DESBLOQUEADO</b>Por decir que sí a todo, una mascota te seguirá por el cementerio."; sb.append(cv,t); } }
+    if(on){ sb.innerHTML=""; const kind=petOf(draft), spr=petCanvas(kind,"frente",0,false);
+      const cv=document.createElement("canvas"); cv.width=24; cv.height=18; const x=cv.getContext("2d"); x.imageSmoothingEnabled=false;
+      const sc=Math.min(24/spr.width,18/spr.height); x.drawImage(spr,(24-spr.width*sc)/2,(18-spr.height*sc)/2,spr.width*sc,spr.height*sc);
+      const t=document.createElement("span"); const nm=(draft.petName||"").trim();
+      t.innerHTML="<b>★ SECRETO DESBLOQUEADO</b>"; t.append(nm ? `${nm} te sigue por el cementerio. Toca para cambiarla.` : "Por decir que sí a todo, una mascota te sigue por el cementerio. Toca para elegirla y ponerle nombre.");
+      sb.append(cv,t); sb.onclick=openPetPicker; } }
   // preguntas
   const qs=$("#qs"); qs.innerHTML="";
   const REW = {attend:["char","PERSONAJE"], party:["hat","ACCESORIOS"], bizum:["hand","CUBO"]};
@@ -2542,6 +2681,12 @@ function buildProfile(){
       b.onclick=()=>{ if(k==="bizum" && v==="si" && draft.bizum==="hecho") return; draft[k]=v; $("#err").textContent=""; buildProfile(); }; o.appendChild(b); }
     m.appendChild(o);
     if(k==="attend" && draft.attend==="quiza"){ const ex=document.createElement("p"); ex.className="qx"; ex.textContent="Con QUIZÁ sigues de fantasma: tu personaje y los premios llegan cuando digas que SÍ."; m.appendChild(ex); }
+    if(k==="party" && draft.party==="si"){
+      const ex=document.createElement("p"); ex.className="qx"; ex.textContent="Oversize · Child's Play en la Galileo Galilei. "+FIESTA.entrada+"."; m.appendChild(ex);
+      const a=document.createElement("a"); a.className="qbtn"; a.href=FIESTA.entradas; a.target="_blank"; a.rel="noopener"; a.textContent="COMPRAR ENTRADA ↗"; m.appendChild(a);
+      const lb=document.createElement("label"); lb.className="qcheck";
+      const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!draft.ticket; cb.onchange=()=>{ draft.ticket=cb.checked; };
+      const sp=document.createElement("span"); sp.textContent="YA TENGO ENTRADA"; lb.append(cb,sp); m.appendChild(lb); }
     if(k==="bizum" && (draft.bizum==="si"||draft.bizum==="hecho")){
       const lb=document.createElement("label"); lb.className="qcheck";
       const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=draft.bizum==="hecho";
@@ -2580,7 +2725,7 @@ $("#p-save").onclick=()=>{
 };
 function save(){
   try{ localStorage.setItem("hw-me", JSON.stringify(me)); }catch(e){} updateCount();
-  if(me) call("halloween_save",{p_data:{nick:me.nick, attend:me.attend||null, party:me.party||null, bizum:me.bizum||"", hatStyle:nz(me.hatStyle,0), faceStyle:nz(me.faceStyle,-1), handStyle:nz(me.handStyle,-1)}});
+  if(me) call("halloween_save",{p_data:{nick:me.nick, attend:me.attend||null, party:me.party||null, bizum:me.bizum||"", ticket:!!me.ticket, hatStyle:nz(me.hatStyle,0), faceStyle:nz(me.faceStyle,-1), handStyle:nz(me.handStyle,-1), petStyle:nz(me.petStyle,0), petName:me.petName||""}});
 }
 
 /* ================= BOOT ================= */
@@ -2593,8 +2738,8 @@ function applyGuests(list){
   const seen=new Set();
   list.forEach((g,i)=>{
     seen.add(g.id);
-    let spot = (g.x!=null && !solidAt(g.x,g.y)) ? [g.x,g.y] : (confirmed(g)?PLAZA_SPOTS:FIELD_SPOTS)[i % (confirmed(g)?PLAZA_SPOTS.length:FIELD_SPOTS.length)];
-    const data={id:g.id, nick:g.nick, avatar:g.avatar, char:"base", color:g.color, attend:g.attend, party:g.party, bizum:g.bizum, hatStyle:g.hatStyle, faceStyle:g.faceStyle, handStyle:g.handStyle};
+    let spot = !confirmed(g) ? ghostSpot(i*3) : (g.x!=null && !solidAt(g.x,g.y)) ? [g.x,g.y] : PLAZA_SPOTS[i % PLAZA_SPOTS.length];
+    const data={id:g.id, nick:g.nick, avatar:g.avatar, char:"base", color:g.color, attend:g.attend, party:g.party, bizum:g.bizum, hatStyle:g.hatStyle, faceStyle:g.faceStyle, handStyle:g.handStyle, petStyle:g.petStyle, petName:g.petName};
     const ex=npcs.find(n=>n.id===g.id);
     if(ex){ Object.assign(ex,data); if(ex.hx!==spot[0]||ex.hy!==spot[1]){ if(!ex.moving){ ex.x=ex.fx=ex.hx=spot[0]; ex.y=ex.fy=ex.hy=spot[1]; } } }
     else npcs.push(mkNpc({...data, x:spot[0], y:spot[1], dir:g.dir}));
@@ -2607,7 +2752,7 @@ async function bootLive(){
   if(!w){ $("#t-btns").innerHTML=""; const p=document.createElement("p"); p.className="t-bad"; p.textContent="Este enlace no es válido. Pide a Adri o Iris tu invitación personal."; $("#t-btns").appendChild(p); $("#t-info").hidden=true; return false; }
   const m=w.me; INVITE_NAME=m.nick;
   candy=m.candy||0; owned=new Set(m.owned||[]);
-  const mine={nick:m.nick, avatar:m.avatar, char:"base", color:m.color, attend:m.attend, party:m.party, bizum:m.bizum, hatStyle:m.hatStyle, faceStyle:m.faceStyle, handStyle:m.handStyle};
+  const mine={nick:m.nick, avatar:m.avatar, char:"base", color:m.color, attend:m.attend, party:m.party, ticket:m.ticket, bizum:m.bizum, hatStyle:m.hatStyle, faceStyle:m.faceStyle, handStyle:m.handStyle, petStyle:m.petStyle, petName:m.petName};
   me = m.attend ? mine : null;
   draft = {...mine, attend:m.attend||""};
   notes = (w.notes||[]).map(noteFrom);
