@@ -1174,7 +1174,14 @@ let INVITE_NAME = "Adri";
 const SC = window.HW_SCENE, GEN = window.HW_GEN, LOOKS = window.HW_LOOKS || {};
 const TS = SC.T, W = SC.cols, H = SC.rows;
 const MAP = SC.map.map(r => (r + " ".repeat(W)).slice(0, W).split(""));
-const solidAt = (x,y) => x<0||y<0||x>=W||y>=H||SC.walk[y][x]!=="1";
+/* Los objetos anchos (tablón, bancos, mausoleos, fosa, árboles grandes) también ocupan las casillas de al lado que tapan con su base */
+const OBJ = {};
+for(const sp of SC.sprites){ if(sp.w<40) continue; const ty=Math.floor((sp.base-4)/TS), x0=Math.floor((sp.x+5)/TS), x1=Math.floor((sp.x+sp.w-5)/TS);
+  let letter=null; for(let x=x0;x<=x1;x++){ const l=MAP[ty]&&MAP[ty][x]; if(l&&!".,=EB #F".includes(l)){ letter=l; break; } }
+  for(let x=x0;x<=x1;x++){ const l=MAP[ty]&&MAP[ty][x]; if(l && !"=EB".includes(l) && SC.walk[ty][x]==="1") OBJ[x+","+ty]=letter||"o"; } }
+const tileAt = (x,y) => OBJ[x+","+y] || (MAP[y]&&MAP[y][x]);
+/* las setas se pisan */
+const solidAt = (x,y) => x<0||y<0||x>=W||y>=H||(SC.walk[y][x]!=="1"&&MAP[y][x]!=="m")||!!OBJ[x+","+y];
 const IMG = {};
 ["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png"; });
 const confirmed = r => !!r && (r.attend==="si"||r.attend==="quiza");
@@ -1484,7 +1491,7 @@ function render(now){
 
 /* ================= MOVEMENT ================= */
 const D = {up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
-const occupied = (x,y,self) => critters.some(n=>n!==self && ((n.x===x&&n.y===y)||(n.moving&&n.from&&n.from[0]===x&&n.from[1]===y))) || npcs.some(n=>n!==self && n.attend!=="no" && ((n.x===x&&n.y===y)||(n.moving&&n.from&&n.from[0]===x&&n.from[1]===y))) || (self!==player && mode==="play" && player.x===x && player.y===y);
+const occupied = (x,y,self) => critters.some(n=>n!==self && ((n.x===x&&n.y===y)||(n.moving&&n.from&&n.from[0]===x&&n.from[1]===y))) || (self!==player && npcs.some(n=>n!==self && n.attend!=="no" && ((n.x===x&&n.y===y)||(n.moving&&n.from&&n.from[0]===x&&n.from[1]===y)))) || (self!==player && mode==="play" && player.x===x && player.y===y);
 function tryMove(e, dir, now){
   e.dir = dir; const [dx,dy] = D[dir]; const nx=e.x+dx, ny=e.y+dy;
   if(solidAt(nx,ny) || occupied(nx,ny,e)) return false;
@@ -1666,7 +1673,7 @@ function interact(){
   const cr = critters.find(c=>c.x===tx&&c.y===ty); if(cr) return talkCritter(cr);
   const n = npcs.find(n=>n.x===tx&&n.y===ty&&n.attend!=="no");
   if(n){ n.dir = {up:"down",down:"up",left:"right",right:"left"}[player.dir]; return showGuest(n); }
-  const t = MAP[ty]&&MAP[ty][tx];
+  const t = tileAt(tx,ty);
   if(t==="T"||t==="C"){ const got=maybeCandy("tb"+tx+","+ty,.5); return say("LÁPIDA", tombText(tx,ty)+(got?"\n\n(Alguien dejó un\ncaramelo de ofrenda)":"")); }
   if(t==="P"){
     if(!isLit(tx,ty)) return say("CALABAZA", "Zzz...\n(Está apagada. Pulsa B\npara encenderla.)");
@@ -2077,6 +2084,8 @@ function save(){
 /* ================= BOOT ================= */
 const PLAZA_SPOTS=[[13,14],[16,14],[13,15],[16,15],[13,13],[16,13],[12,15],[17,15],[13,16],[16,16],[12,13],[17,13],[12,16],[17,16],[13,11],[16,11],[19,14],[10,15],[19,15],[13,18]];
 const FIELD_SPOTS=[[29,13],[16,8],[9,27],[20,7],[26,8],[17,3],[7,12],[18,21],[21,15],[10,3],[16,28],[5,20],[12,18],[21,26],[24,24],[5,15],[12,10],[6,24],[9,22],[8,6],[27,22],[23,18],[2,17]];
+PLAZA_SPOTS.splice(0,PLAZA_SPOTS.length,...PLAZA_SPOTS.filter(([x,y])=>!solidAt(x,y)));
+FIELD_SPOTS.splice(0,FIELD_SPOTS.length,...FIELD_SPOTS.filter(([x,y])=>!solidAt(x,y)));
 function noteFrom(n){ return {id:n.id, text:n.text, by:n.by, t:new Date(n.at).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}; }
 function applyGuests(list){
   const seen=new Set();
