@@ -26,7 +26,7 @@ section{display:grid;gap:12px}
 .stat b{display:block;font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
 .stat span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
 .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
-table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
 th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
 th{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
 tr:last-child td{border-bottom:0}
@@ -63,7 +63,7 @@ form.add input{flex:1 1 220px;min-width:0;font:15px var(--f-body);background:var
       <h2>Invitados</h2>
       <form class="add" id="add"><input id="nick" maxlength="20" placeholder="Nombre del nuevo invitado" required><button>Añadir y crear enlace</button></form>
       <div class="tablewrap"><table>
-        <thead><tr><th>Invitado</th><th>Casa</th><th>Fiesta</th><th>Cenado</th><th>Disfraz</th><th>Caramelos</th><th>Abrió</th><th>Enlace</th></tr></thead>
+        <thead><tr><th>Invitado</th><th>Casa</th><th>Fiesta</th><th>Bote</th><th>Caramelos</th><th>Abrió</th><th>Enlace</th></tr></thead>
         <tbody id="rows"></tbody>
       </table></div>
     </section>
@@ -82,7 +82,7 @@ async function api(fn, args){
   const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {method:"POST", headers:{apikey:CFG.key, Authorization:`Bearer ${CFG.key}`, "Content-Type":"application/json"}, body:JSON.stringify({p_token:TOKEN, ...args})});
   if(!r.ok) throw new Error(await r.text()); const t=await r.text(); return t?JSON.parse(t):null;
 }
-const L = {attend:{si:"Viene",quiza:"Quizá",no:"No viene"}, yn:{si:"Sí",no:"No"}};
+const L = {attend:{si:"Viene",quiza:"Quizá",no:"No viene"}, yn:{si:"Sí",no:"No"}, bizum:{si:"Se suma (pendiente)",hecho:"Bizum hecho ✓",no:"No"}};
 const fmt = d => d ? new Date(d).toLocaleString("es-ES",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "—";
 function cell(tr, text, cls){ const td=document.createElement("td"); if(cls) td.className=cls; td.textContent=text; tr.appendChild(td); return td; }
 async function load(){
@@ -92,14 +92,14 @@ async function load(){
   const g = d.guests, yes = g.filter(x=>x.attend==="si");
   $("#stats").innerHTML = "";
   [[yes.length,"vienen a casa"],[g.filter(x=>x.attend==="quiza").length,"quizá"],[yes.filter(x=>x.party==="si").length,"siguen a la fiesta"],
-   [yes.filter(x=>x.dinner==="no").length,"vienen sin cenar"],[g.filter(x=>x.attend==="no").length,"no pueden"],[g.filter(x=>!x.attend).length,"sin responder"],[g.filter(x=>x.opened_at).length+"/"+g.length,"abrieron su enlace"]]
+   [yes.filter(x=>x.bizum==="si"||x.bizum==="hecho").length,"se suman al bote"],[g.filter(x=>x.bizum==="hecho").length+" · "+(g.filter(x=>x.bizum==="hecho").length*10)+" €","bizums hechos"],[g.filter(x=>x.attend==="no").length,"no pueden"],[g.filter(x=>!x.attend).length,"sin responder"],[g.filter(x=>x.opened_at).length+"/"+g.length,"abrieron su enlace"]]
    .forEach(([v,l])=>{ const s=document.createElement("div"); s.className="stat"; s.innerHTML="<b></b><span></span>"; s.querySelector("b").textContent=v; s.querySelector("span").textContent=l; $("#stats").appendChild(s); });
   const tb = $("#rows"); tb.innerHTML = "";
   for(const x of g){
     const tr = document.createElement("tr");
     const n = cell(tr, x.nick); if(x.is_host){ const h=document.createElement("span"); h.className="host"; h.textContent="ANFITRIÓN"; n.appendChild(h); }
     const td = document.createElement("td"); const p=document.createElement("span"); p.className="pill "+(x.attend||""); p.textContent=L.attend[x.attend]||"Sin responder"; td.appendChild(p); tr.appendChild(td);
-    cell(tr, L.yn[x.party]||"—"); cell(tr, L.yn[x.dinner]||"—"); cell(tr, L.yn[x.costume]||"—"); cell(tr, x.candy, "num"); cell(tr, fmt(x.opened_at));
+    cell(tr, L.yn[x.party]||"—"); cell(tr, L.bizum[x.bizum]||"—"); cell(tr, x.candy, "num"); cell(tr, fmt(x.opened_at));
     const lc = document.createElement("td"); const b=document.createElement("button"); b.className="ghost"; b.textContent="Copiar enlace";
     const link = BASE + "?i=" + x.token;
     b.onclick = async ()=>{ try{ await navigator.clipboard.writeText(link); b.textContent="¡Copiado!"; }catch(e){ prompt("Enlace de "+x.nick, link); } setTimeout(()=>b.textContent="Copiar enlace",1500); };
