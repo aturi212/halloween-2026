@@ -2511,12 +2511,13 @@ $("#tr-play").onclick=playTrile; $("#tr-b").onclick=closeTrile;
 /* ================= MENSAJES PRIVADOS =================
    Al hablar con un invitado, A le escribe. En la portada, el botón MENSAJES (con puntito rojo si hay sin leer)
    abre la lista de chats; cada chat es una conversación con una persona. */
-let unread=0, msThread=null, msPoll=0;
+let unread=0, msThread=null, msPoll=0, hasChats=!LIVE;
 const DEMO_MSGS={"e1":[{mine:false,text:"¡Eyy! ¿De qué te vas a disfrazar? Yo dudo entre bruja y Morticia 🖤",at:new Date().toISOString()}]};
 if(!LIVE) unread=1;
-function msgBtn(){ const b=tbtn("✉","MENSAJES","",false,openInbox); b.id="t-msgs"; paintUnread(b); return b; }
+function msgBtn(){ if(!hasChats && unread<1) return []; const b=tbtn("✉","MENSAJES","",false,openInbox); b.id="t-msgs"; paintUnread(b); return [b]; }
 function paintUnread(b){ for(const el of [b||$("#t-msgs"), $("#btn-menu")]){ if(!el) continue; let d=el.querySelector(".notif"); if(unread>0){ if(!d){ d=document.createElement("span"); d.className="notif"; el.appendChild(d); } d.textContent=unread>9?"9+":unread; } else if(d) d.remove(); } }
-async function refreshUnread(){ if(!LIVE) return paintUnread(); const n=await call("halloween_msg_unread"); if(typeof n==="number"){ unread=n; paintUnread(); } }
+async function refreshUnread(){ if(!LIVE) return paintUnread(); const n=await call("halloween_msg_unread"); if(typeof n==="number"){ unread=n; if(n>0 && !hasChats){ hasChats=true; if(mode==="title" && $("#s-msgs").hidden) buildTitle(); } paintUnread(); } }
+async function checkChats(){ if(!LIVE) return; const l=await call("halloween_msg_inbox"); if(Array.isArray(l) && l.length && !hasChats){ hasChats=true; if(mode==="title") buildTitle(); } }
 if(LIVE) setInterval(refreshUnread, 30000);
 const whoById = id => npcs.find(n=>n.id===id);
 async function openInbox(){
@@ -2557,7 +2558,7 @@ $("#ms-form").addEventListener("submit", async e=>{
   inp.value="";
   if(LIVE){ const r=await call("halloween_msg_send",{p_to:msThread.id, p_text:text}); if(!r){ inp.value=text; return; } }
   else (DEMO_MSGS[msThread.id]=DEMO_MSGS[msThread.id]||[]).push({mine:true,text,at:new Date().toISOString(),read:true});
-  haptic(10); loadThread(true);
+  hasChats=true; haptic(10); loadThread(true);
 });
 function msgsBack(){ if(!$("#ms-thread").hidden) return openInbox(); $("#s-msgs").hidden=true; msThread=null; clearInterval(msPoll); if(mode==="title") buildTitle(); }
 $("#ms-b").onclick=msgsBack;
@@ -2778,10 +2779,10 @@ function arrive(now){
 function buildTitle(){
   const box=$("#t-btns"); box.innerHTML="";
   if(confirmed(me)){
-    box.append(tbtn("▶","ENTRAR AL CEMENTERIO","",true,enter), tbtn("✎","MI PERSONAJE","",false,openProfile), msgBtn());
+    box.append(tbtn("▶","ENTRAR AL CEMENTERIO","",true,enter), tbtn("✎","MI PERSONAJE","",false,openProfile), ...msgBtn());
   } else {
     const no = me && me.attend==="no";
-    box.append(tbtn("✦", no?"¡AL FINAL VOY!":"CONFIRMAR ASISTENCIA","",true,openProfile), tbtn("▶","ENTRAR AL CEMENTERIO","",false,enter), msgBtn());
+    box.append(tbtn("✦", no?"¡AL FINAL VOY!":"CONFIRMAR ASISTENCIA","",true,openProfile), tbtn("▶","ENTRAR AL CEMENTERIO","",false,enter), ...msgBtn());
     if(!no){
       const l=document.createElement("button"); l.type="button"; l.className="t-link"; l.textContent="No puedo ir";
       l.onclick=()=>{ me={...draft,attend:"no"}; save(); buildTitle(); };
@@ -3151,7 +3152,7 @@ async function bootLive(){
   draft = {...mine, attend:m.attend||""};
   notes = (w.notes||[]).map(noteFrom);
   applyGuests(w.guests||[]);
-  updateCandy(); setMode("title"); ping(); refreshUnread();
+  updateCandy(); setMode("title"); ping(); refreshUnread(); checkChats();
   if(!m.seenIntro) showIntro();
   setInterval(async()=>{ const r=await call("halloween_world"); if(r){ applyGuests(r.guests||[]); notes=(r.notes||[]).map(noteFrom); if(!$("#s-board").hidden && !$("#notes").hidden) renderNotes(); } }, 30000);
   return true;
