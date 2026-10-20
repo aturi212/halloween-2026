@@ -1357,16 +1357,19 @@ const SC = window.HW_SCENE, GEN = window.HW_GEN, LOOKS = window.HW_LOOKS || {};
    Zona nueva al este, cruzando el puente por un hueco del seto. Ahí esperan los fantasmas (los que aún no han dicho que sí).
    El suelo ya viene pintado en suelo.png (columnas 32-47); aquí se amplían el mapa y la rejilla de paso. */
 const CLARO = {
-  map:["FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFF.....FFFFF", "FFFFF.......FFFF", "FFFF...Z.Z...FFF", "FFF...........FF", "FFF.........Z.FF", "FFF....QQQ....FF", "====...QQQ.....F", "FFF....QQQ....FF", "FFF.........Z.FF", "FFF...........FF", "FFFF...Z.Z...FFF", "FFFFF.......FFFF", "FFFFFF.....FFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF"],
-  walk:["0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000001111100000", "0000011111110000", "0000111010111000", "0001111111111100", "0001111111110100", "0001111000111100", "1111111000111110", "0001111000111100", "0001111111110100", "0001111111111100", "0000111010111000", "0000011111110000", "0000001111100000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000"],
-  stones:[[39, 8], [39, 16], [41, 8], [41, 16], [44, 10], [44, 14]],
-  mush:[[41.86, 16.09], [45.8, 14.87], [39.97, 9.55], [43.62, 8.41], [44.0, 8.13], [41.79, 7.97], [36.78, 9.14], [40.83, 15.25], [45.19, 10.24], [38.64, 8.49], [37.91, 14.26], [38.36, 10.39], [44.27, 12.65], [38.08, 12.65]],
-  spots:[[36, 8], [37, 17], [41, 10], [40, 7], [38, 8], [37, 13], [45, 13], [44, 16], [40, 18], [40, 9], [42, 17], [38, 10], [38, 6], [40, 10], [36, 14], [38, 14], [35, 14], [38, 17], [44, 15], [42, 16], [44, 8], [44, 9], [38, 7], [36, 11], [45, 14], [43, 9], [37, 11], [43, 16], [39, 15], [42, 18], [43, 12], [45, 9], [42, 8], [41, 18], [37, 16], [41, 17], [36, 16], [35, 13], [43, 10], [35, 15]],
-  cx:40.5, cy:12.5, rx:6, ry:6.6,
+  map:["FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFF..Z.ZFFFFF", "FFFFF.Z....ZFFFF", "FFFF.........FFF", "FF######EE#####F", "FFF...........FF", "FFF...........FF", "===...QQ.......F", "FFF..QQQQQ....FF", "FFF.QQQQQDDD..FF", "FFF.QQQQQQQ...FF", "FFFFQQQQQQ...FFF", "FFFFF.......FFFF", "FFFFFF.....FFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF"],
+  walk:["0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000001101000000", "0000010111100000", "0000111111111000", "0000000011000000", "0001111111111100", "0001111111111100", "1111110011111110", "0001100000111100", "0001000001111100", "0001000000011100", "0000000000111000", "0000011111110000", "0000001111100000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000"],
+  stones:[[38, 7], [40, 6], [42, 6], [43, 7]],
+  mush:[[39.89, 10.73], [42.85, 11.83], [37.13, 7.05], [40.43, 18.43], [39.39, 6.73], [37.48, 8.44], [41.54, 7.2], [41.32, 18.03], [35.23, 13.06], [41.69, 18.92], [42.88, 18.81], [42.49, 13.76]],
+  spots:[[41, 8], [41, 11], [45, 12], [41, 6], [42, 7], [43, 12], [44, 8], [39, 8], [37, 11], [44, 11], [37, 8], [41, 17], [36, 12], [40, 8], [39, 10], [44, 16], [42, 17], [45, 11], [36, 11], [41, 12], [38, 17], [43, 13], [36, 13], [40, 12], [39, 17], [40, 17], [42, 18], [35, 15], [43, 17], [44, 10], [44, 12], [38, 8], [41, 18], [36, 8], [42, 12], [35, 13], [41, 10], [39, 11], [43, 10], [43, 15]],
+  frogs:[{"x": 41.72, "y": 15.98, "pad": 1}, {"x": 38.34, "y": 15.09, "pad": 1}, {"x": 40.84, "y": 15.86, "pad": 1}, {"x": 42.11, "y": 14.76, "pad": 1}, {"x": 42.5, "y": 16.6, "pad": 0, "tx": 42, "ty": 16}, {"x": 37.5, "y": 17.6, "pad": 0, "tx": 37, "ty": 17}],
+  sparkles:[[1241, 475], [1268, 503], [1245, 538], [1223, 485], [1299, 427], [1195, 528], [1250, 470], [1311, 458], [1239, 492], [1227, 449], [1255, 441], [1292, 472], [1263, 461], [1221, 460], [1235, 479], [1283, 469], [1290, 493], [1248, 485], [1256, 464], [1261, 460], [1271, 447], [1249, 526], [1297, 508], [1262, 476], [1270, 498], [1262, 461], [1281, 418], [1308, 505], [1287, 509], [1251, 481], [1173, 459], [1301, 508], [1258, 480], [1233, 497], [1318, 462], [1248, 473], [1255, 529], [1201, 494], [1339, 471], [1259, 481], [1280, 460], [1257, 479], [1265, 467], [1246, 474], [1273, 478], [1318, 470], [1308, 456], [1346, 450], [1245, 525], [1185, 455], [1269, 505], [1285, 443], [1175, 493], [1235, 492], [1269, 490], [1249, 498], [1257, 491], [1225, 453], [1275, 501], [1256, 470]],
+  cx:40.5, cy:12.5, rx:6, ry:6.6, lx:39.4, ly:14.9,
 };
 SC.cols=48; SC.w=48*SC.T;
 SC.map=SC.map.map((r,y)=>{ const row=(r+" ".repeat(32)).slice(0,32).split(""); if(y===12) row[31]="="; return row.join("")+CLARO.map[y]; });
 SC.walk=SC.walk.map((r,y)=>{ const row=r.slice(0,32).split(""); if(y===12) row[31]="1"; return row.join("")+CLARO.walk[y]; });
+SC.water=SC.water.concat(CLARO.sparkles);
 const inClaro = (x,y) => x>=33;
 const TS = SC.T, W = SC.cols, H = SC.rows;
 const MAP = SC.map.map(r => (r + " ".repeat(W)).slice(0, W).split(""));
@@ -1382,7 +1385,7 @@ for(const sp of SC.sprites){ if(sp.w<40) continue; const ty=Math.floor((sp.base-
   for(let x=x0;x<=x1;x++){ const l=MAP[ty]&&MAP[ty][x]; if(l && !"=EB".includes(l) && SC.walk[ty][x]==="1") OBJ[x+","+ty]=letter||"o"; } }
 /* Gramola: al lado del camino de entrada, enfrente del tablón */
 const GRAMO = {x:13, y:24}; OBJ[GRAMO.x+","+GRAMO.y]="J";
-const CALDERO = {x:43, y:12}; OBJ[CALDERO.x+","+CALDERO.y]="U";
+const CALDERO = {x:44, y:13}; OBJ[CALDERO.x+","+CALDERO.y]="U";
 const SPOTIFY_URL = "https://open.spotify.com/playlist/1ido1a7hGXDYKRhZRajsIG?si=_A5kMq_CT0eYuZzUEq-tPw&utm_source=copy-link&pi=jhTGYGu-SfeVi&pt=34e9512b78a712b1f544106b251e8825";
 const tileAt = (x,y) => OBJ[x+","+y] || (MAP[y]&&MAP[y][x]);
 /* las setas se pisan */
@@ -1392,7 +1395,7 @@ const GATE_T = new Set(["14,29","15,29","14,30","15,30"]);
 let gateOpenUntil = 0;
 const solidAt = (x,y) => GATE_T.has(x+","+y) || x<0||y<0||x>=W||y>=H||(SC.walk[y][x]!=="1"&&MAP[y][x]!=="m")||!!OBJ[x+","+y];
 const IMG = {};
-["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png?v=20261020c"; });
+["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png?v=20261020d"; });
 /* Solo el SÍ da personaje: los de QUIZÁ siguen de fantasma */
 const confirmed = r => !!r && r.attend==="si";
 const look = r => confirmed(r) ? r : {...r, char:"fantasma", color:"#cfc8e6", party:"", costume:"", ghost:true};
@@ -1417,7 +1420,7 @@ const critters = [
   {kind:"esqueleto", rec:{char:"calavera",color:"#efe8d6",attend:"si"}, x:5,y:8, speed:320, rad:1},
   {kind:"cuervo", rec:{char:"cuervo",color:"#17122a",attend:"si"}, x:16,y:2, speed:150, rad:2},
   {kind:"sepulturero", rec:{char:"base",nick:"Sepulturero",avatar:"sepulturero",attend:"si"}, x:4,y:19, speed:400, rad:0},
-  {kind:"bruja", rec:{char:"base",nick:"Bruja",avatar:"bruja",attend:"si",party:"si",hatStyle:3,faceStyle:-1}, x:44,y:12, speed:400, rad:0},
+  {kind:"bruja", rec:{char:"base",nick:"Bruja",avatar:"bruja",attend:"si",party:"si",hatStyle:3,faceStyle:-1}, x:45,y:14, speed:400, rad:0},
 ].map(c=>({...c, fx:c.x, fy:c.y, hx:c.x, hy:c.y, dir:"down", moving:false, t0:0, from:null, next:performance.now()+Math.random()*3000}));
 const wisp = {x:21,y:26, fx:21, fy:26, tx:21, ty:26};
 const WISP_SPOTS = [[21,26],[29,13],[9,27],[26,8],[17,3],[7,12],[5,20],[24,24],[2,17],[27,22]];
@@ -1721,6 +1724,23 @@ const GRAMO_SPR = [0,1,2,3].map(fr=>{
   return c;
 });
 const gramoNotes=[]; let gramoNextNote=0;
+/* Ranas del pantano: en los nenúfares y en la orilla; parpadean, croan y a veces dan un saltito */
+const FROG_SPR = [0,1,2].map(fr=>{ const rows=[".Oy...yO.","OyyOOOyyO","OgggggggO","OgLLLLLgO",".OgggggO.","OgO...OgO"];
+  const c=document.createElement("canvas"); c.width=9; c.height=8; const x=c.getContext("2d");
+  rows.forEach((r,y)=>[...r].forEach((k,i)=>{ if(k===".") return; let col={O:"#0e1e18",y:"#e8e070",g:"#3f8a4a",L:"#8ccf7a"}[k];
+    if(fr===1&&k==="y") col="#3f8a4a"; x.fillStyle=col; x.fillRect(i,y+(fr===2?0:2),1,1); }));
+  if(fr===2){ x.fillStyle="#b8f0a8"; x.fillRect(3,6,3,2); }
+  return c; });
+const frogs = CLARO.frogs.map((f,i)=>({...f, hop:0, next:2000+i*1700, croak:0}));
+function drawFrogs(L, g, camX, camY, now){
+  for(const f of frogs){
+    if(now>f.next){ f.next=now+3000+Math.random()*5000; if(Math.random()<.5) f.hop=now; else f.croak=now; }
+    const hk=f.hop?(now-f.hop)/450:1; if(hk>=1) f.hop=0;
+    const blink=Math.sin(now/700+f.x*3)>.97, croak=f.croak&&now-f.croak<600;
+    const spr=FROG_SPR[croak?2:blink?1:0], X=Math.round(f.x*TS-4-camX), Y=Math.round(f.y*TS-7-camY-(f.hop?Math.sin(hk*Math.PI)*7:0));
+    L.push({b:f.y*TS+1, d:()=>g.drawImage(spr,X,Y)});
+  }
+}
 /* Caldero de la bruja: verde burbujeante */
 function drawCaldero(g, camX, camY, now){
   const X=CALDERO.x*TS+6-camX, Y=CALDERO.y*TS+12-camY;
@@ -1814,7 +1834,7 @@ function render(now){
   for(const c of chars){ if(c.critter || !allIn(c) || (c.isMe && player.sit && PET_KIND[petOf(c)]!=="orbita")) continue; pushPet(L, g, c, camX, camY, now); }
   L.push({b:GATE.base, d:()=>drawGateW(g, camX, camY, now)});
   L.push({b:GRAMO.y*TS+30, d:()=>drawGramo(g, camX, camY, now)});
-  if(camX+VW > 40*TS) L.push({b:CALDERO.y*TS+30, d:()=>drawCaldero(g, camX, camY, now)});
+  if(camX+VW > 40*TS){ L.push({b:CALDERO.y*TS+30, d:()=>drawCaldero(g, camX, camY, now)}); drawFrogs(L, g, camX, camY, now); }
   if(camX+VW > 32*TS){
     CLARO.stones.forEach(([sx,sy],k)=>{ const spr=MENHIR_SPR[k%2]; L.push({b:sy*TS+30, d:()=>g.drawImage(spr, sx*TS+5-camX, sy*TS+30-spr.height+3-camY)}); });
     for(const [mx,my] of CLARO.mush) L.push({b:my*TS, d:()=>g.drawImage(MUSH_SPR, Math.round(mx*TS-camX), Math.round(my*TS-camY))}); }
@@ -1831,7 +1851,7 @@ function render(now){
   g.globalCompositeOperation="lighter";
   if(camX+VW > 30*TS){ // luz fría y mágica del claro
     const glow=(x,y,r,col,a)=>{ const lg=g.createRadialGradient(x,y,0,x,y,r); lg.addColorStop(0,`rgba(${col},${a})`); lg.addColorStop(1,`rgba(${col},0)`); g.fillStyle=lg; g.fillRect(x-r,y-r,r*2,r*2); };
-    glow(CLARO.cx*TS-camX, CLARO.cy*TS+4-camY, 95, "160,110,255", .2+.05*Math.sin(t*1.3));
+    glow(CLARO.lx*TS-camX, CLARO.ly*TS-camY, 110, "160,110,255", .2+.05*Math.sin(t*1.3));
     CLARO.stones.forEach(([sx,sy],k)=>{ const pulse=.5+.5*Math.sin(t*1.7+k*1.3); glow(sx*TS+16-camX, sy*TS+30-MENHIR_SPR[k%2].height+20-camY, 22, "190,120,255", .18+.3*pulse);
       if(pulse>.2){ g.fillStyle=`rgba(220,170,255,${.35+.6*pulse})`; RUNES[k%2].forEach(([rx,ry])=>g.fillRect(sx*TS+5+rx-camX, sy*TS+30-MENHIR_SPR[k%2].height+3+ry+(k%2?0:2)-camY,1,1)); } });
     glow(CALDERO.x*TS+16-camX, CALDERO.y*TS+12-camY, 30, "90,255,130", .22+.08*Math.sin(t*3));
@@ -1930,7 +1950,7 @@ function advance(e, now, dur){
 }
 let lastPos={x:14,y:28}, moveTimer=0;
 let inClaroNow=false;
-function areaBanner(){ const t=document.createElement("div"); t.className="area"; t.innerHTML="EL CLARO DE LAS ÁNIMAS<small>donde esperan los que aún no se deciden</small>"; $("#phone").appendChild(t); setTimeout(()=>t.remove(),3300); }
+function areaBanner(){ const t=document.createElement("div"); t.className="area"; t.innerHTML="EL PANTANO DE LAS ÁNIMAS<small>donde esperan los que aún no se deciden</small>"; $("#phone").appendChild(t); setTimeout(()=>t.remove(),3300); }
 function update(now){
   if(mode==="play"){ const ic=inClaro(player.x,player.y); if(ic&&!inClaroNow) areaBanner(); inClaroNow=ic; }
   updatePet(now);
@@ -2118,25 +2138,16 @@ canvas.addEventListener("pointerdown",e=>{
   if(best) best.critter ? talkCritter(best.critter) : showGuest(best);
 });
 
-const PUMPKIN_LINES = [
-  "Tengo la cabeza hueca,\npero las ideas claras.",
-  "¿Has confirmado ya?\nNo me hagas enfadar.",
-  "Me tallaron con cariño.\nCreo.",
-  "Esta noche brillo más\nque tú. Asúmelo.",
-  "Si me apagas con la B\nme ofendo un poquito.",
-  "Dicen que el cementerio\nestá muy animado hoy.",
-];
-const SKELETON_LINES = [
-  "¿Que por qué no bailo?\nNo tengo cuerpo para ello.",
-  "Estoy en los huesos.\n¿Quedan caramelos?",
-  "Llevo aquí desde 1823.\nY sigo sin plan para hoy.",
-  "Me rompí una costilla\nde la risa. Literal.",
-];
-const NAMES1 = ["Don Eustaquio","Doña Remedios","Anacleto","Purificación","Fermín","Doña Angustias","Sinforoso","Tiburcia","Don Cosme","Leocadia"];
-const NAMES2 = ["Calaverón","Ultratumba","del Ataúd","Escalofrío","Huesitos","Telaraña","Sepulcro","Tenebroso","Lápida","Cripta"];
-const EPI = ["Se fue sin pagar\nla última ronda.","Dijo 'solo una'.","No confirmó a tiempo.","Murió de envidia\nde tu disfraz.","Prometió volver.\nY lo cumple cada año.","Descanse en fiesta."];
+const PUMPKIN_LINES = ["Tengo la cabeza hueca,\npero las ideas claras.", "¿Has confirmado ya?\nNo me hagas enfadar.", "Me tallaron con cariño.\nCreo.", "Esta noche brillo más\nque tú. Asúmelo.", "Dicen que el cementerio\nestá muy animado hoy.", "Mi primo acabó en\ncrema. No preguntes.", "Llevo una vela dentro.\nY ardo en deseos\nde fiesta.", "Si ves a la bruja,\nno le digas dónde\nestoy.", "Soy de temporada.\nComo tú en la\nOversize.", "¿Tienes fuego?\nAh, no, que ya tengo.", "Me han dicho que hay\npizza. Yo no puedo.\nNo tengo estómago.", "Cuidado con el cuervo.\nA mí me robó una pipa."];
+const SKELETON_LINES = ["¿Que por qué no bailo?\nNo tengo cuerpo para ello.", "Estoy en los huesos.\n¿Quedan caramelos?", "Llevo aquí desde 1823.\nY sigo sin plan para hoy.", "Me rompí una costilla\nde la risa. Literal.", "No me va el gimnasio.\nYa estoy definido.", "Me han invitado a la\nfiesta, pero no tengo\nagallas. Ni nada.", "Ayer me dio un\nescalofrío. Me\nrecorrió entero. Rápido.", "¿Sabes tocar el\nxilófono? Yo soy\nel xilófono.", "Mi médico dice que\nme falta calcio.\nSoy todo calcio.", "Si vas a la Oversize,\nguárdame un hueco.\nO un hueso."];
+const NAMES1 = ["Don Eustaquio", "Doña Remedios", "Anacleto", "Purificación", "Fermín", "Doña Angustias", "Sinforoso", "Tiburcia", "Don Cosme", "Leocadia", "Don Ataúlfo", "Doña Celedonia", "Pancracio", "Eufrasia", "Don Nicanor", "Doña Escolástica", "Hermenegildo", "Filomena", "Don Tranquilino", "Rosendo"];
+const NAMES2 = ["Calaverón", "Ultratumba", "del Ataúd", "Escalofrío", "Huesitos", "Telaraña", "Sepulcro", "Tenebroso", "Lápida", "Cripta", "del Nicho", "Mortaja", "Sinpulso", "del Ciprés", "Velatorio", "Cadavérez", "Tumbilla", "de la Fosa"];
+const EPI = ["No confirmó a tiempo.", "Se fue sin pagar\nla última ronda.", "Dijo 'solo una'.", "Murió de envidia\nde tu disfraz.", "Prometió volver.\nY lo cumple cada año.", "Descanse en fiesta.", "Vino sin disfraz.\nSe lo tomaron mal.", "Se comió las setas\nde la entrada.", "Probó el ponche\nde la bruja.", "Fue a por hielo\nen 1987.", "Pidió 'la última\ncanción'. Era la quinta.", "Dijo 'yo conduzco'.", "Leyó el tablón entero.\nEn voz alta.", "Bailó la conga\ncon un zombi.", "Quiso ver amanecer\nen la fiesta.\nLo consiguió.", "Se le acabó la batería\ndel móvil. No lo superó.", "Llamó 'disfraz' a unas\norejas de gato.", "Contestó al grupo\ncon un audio de\nnueve minutos.", "Se quedó a recoger.\nNadie más.", "Despertó al\nsepulturero.", "Apostó contra\nel esqueleto.", "Le robó un caramelo\nal cuervo.", "Dijo 'quizá'.\nY aquí sigue.", "Bajó a por pizza.\nVuelve en breve.", "Tocó el timbre\nequivocado.", "Pidió el Uber\na las 6:01.", "Dijo que el reggaetón\nle daba igual.\nMintió.", "Hizo el bizum.\nDescanse en paz.", "No hizo el bizum.\nAquí está.", "Se puso el disfraz\nal revés. Y gustó.", "Abrió la puerta\ndel mausoleo.", "Fue el primero en llegar\ny el último en irse.", "Brindó con agua.\nNunca se supo por qué.", "Confundió el pozo\ncon la fuente.", "Se rió del\nespantapájaros.", "Repitió chupito.\nDos veces.", "Se bañó en la laguna.\nLas ranas lo saben.", "Pisó el tablón.\nEl tablón ganó.", "Dijo 'me voy ya'\na la una. Son las seis.", "Vino de fantasma\ncon una sábana de\nIKEA. Se notaba."];
+/* Cada tumba tiene su nombre y su epitafio fijos, y no se repiten entre tumbas */
+const TOMBS = []; for(let y=0;y<H;y++) for(let x=0;x<W;x++) if(MAP[y][x]==="T"||MAP[y][x]==="C") TOMBS.push(x+","+y);
+TOMBS.sort((a,b)=>hash(...a.split(",").map(Number))-hash(...b.split(",").map(Number)));
 function tombText(x,y){
-  const a=Math.floor(hash(x,y)*NAMES1.length), b=Math.floor(hash(y,x+7)*NAMES2.length), e=Math.floor(hash(x+3,y+5)*EPI.length);
+  const i=Math.max(0,TOMBS.indexOf(x+","+y)), a=i%NAMES1.length, b=(i*7+3)%NAMES2.length, e=i%EPI.length;
   const y1=1700+Math.floor(hash(x,y+9)*200), y2=y1+20+Math.floor(hash(x+1,y)*70);
   return `AQUÍ YACE\n${NAMES1[a].toUpperCase()} ${NAMES2[b].toUpperCase()}\n${y1} - ${y2}\n\n${EPI[e]}`;
 }
@@ -2171,10 +2182,10 @@ function maybeCandy(key, chance){
 function talkCritter(c){
   c.dir = {up:"down",down:"up",left:"right",right:"left"}[player.dir];
   const ck="cr"+critters.indexOf(c);
-  if(c.kind==="gato"){ const got=maybeCandy(ck,.6); return say("GATO", got?"¡Miau!\n(Te ha traído algo\nen la boca...)":["¡Miau!","Miau...","Prrrr. Miau."][Math.floor(Math.random()*3)], c.rec); }
+  if(c.kind==="gato"){ const got=maybeCandy(ck,.6); return say("GATO", got?"¡Miau!\n(Te ha traído algo\nen la boca...)":pick(CAT_LINES), c.rec); }
   if(c.kind==="zombie") return say("ZOMBI", "Grrr... ¿un chiste?\n\n"+ZOMBIE_JOKES[Math.floor(Math.random()*ZOMBIE_JOKES.length)], c.rec);
   if(c.kind==="cuervo"){
-    if(candy<1) return say("CUERVO", "¡Cra! (Te registra los\nbolsillos, no encuentra\nnada y se ofende.)", c.rec);
+    if(candy<1) return say("CUERVO", pick(CROW_LINES), c.rec);
     setCandy(candy-1); stash(1); toastMsg("¡EL CUERVO TE HA ROBADO!", true);
     if(candy>0){ pendingB="cuervo"; return say("CUERVO", "¡Cra! Se lo traga entero.\n\nDame otro y te cuento\nun secreto de la fiesta.\n(Pulsa A para dárselo)", c.rec); }
     return say("CUERVO", "¡Cra! Se lo guarda en\nel pico y mira de reojo\nhacia un árbol seco.\n\nSi tuvieras otro, te\ncontaría un secreto...", c.rec); }
@@ -2192,7 +2203,7 @@ const ZOMBIE_JOKES = [
   "¿Qué hace un zombi\nen el gimnasio?\n\nPerder peso... a trozos.",
   "Me dijeron: 'échale\ncabeza al asunto'.\nY aquí estoy, buscando\nuna que me sirva.",
   "Toc, toc.\n—¿Quién es?\n—Zombi.\n—¿Zombi quién?\n—Zombienvenido\na la fiesta.",
-  "¿Por qué el esqueleto\nno baila?\n\nPorque no tiene\ncuerpo para eso."];
+  "¿Por qué el esqueleto\nno baila?\n\nPorque no tiene\ncuerpo para eso.", "¿Qué come un zombi\nvegano?\n\nGRAAAANOS.", "¿Cómo se llama un\nzombi que cocina?\n\nEl chef de la muerte.", "Fui a una entrevista\nde trabajo. Me dijeron\nque me faltaba cabeza.\nLa llevaba en la mano.", "Mi ex dice que no\ntengo corazón.\nSe equivoca: lo llevo\nen el bolsillo.", "¿Por qué los zombis\njuegan fatal al fútbol?\n\nPorque siempre se\nles cae algo.", "No me gusta salir\nde fiesta. Siempre\nacabo hecho polvo.", "Me apunté a yoga.\nLa postura del muerto\nme sale perfecta.", "¿Qué le dice un zombi\nen una boda?\n\n¡Vivan los novios!\n...perdón, se me\nha escapado.", "Mi madre siempre decía:\n'come algo antes de\nsalir'. Y mira cómo\nacabé.", "Toc, toc.\n—¿Quién es?\n—Un zombi.\n—¿Un zombi qué?\n—Un zombi-cicleta.\n(No me lo tengas\nen cuenta.)", "Me han dicho que en la\nOversize hay concurso\nde disfraces. Yo voy\nasí de serie.", "¿Cerebros? No, gracias.\nEstoy a dieta. Solo\ncomo cabezas huecas.\n¿Tienes una?"];
 const PREDICTIONS = ["Esta noche bailarás\nmás de lo que crees.","Alguien llevará tu\nmismo disfraz.","La última canción\nla pedirás tú.","Encontrarás algo\nque perdiste en 2019.","Mañana no recordarás\nla mitad. Y bien.","Te tocará hacer\nde DJ un rato."];
 /* La bruja del claro: por un caramelo te da una idea de disfraz (en la web salen de la base de datos y no se repiten) */
 const WITCH_IDEAS = ["TÍA GLADYS (Weapons).\nPeluca naranja cortita,\ncolorete rojo en dos\ncírculos y labios\npintados por fuera.\nCorre con los brazos\nhacia atrás. Nadie lo\nolvidará.", "LAS GEMELAS DE\nEL RESPLANDOR.\nDos vestidos azul cielo,\nlazo blanco, calcetines\naltos. Quietas, de la\nmano, sin parpadear.\nGanan siempre.", "JACK TORRANCE\nASOMADO.\nCamisa de pana, hacha\nde cartón y un marco\nde puerta roto hecho\ncon una caja. Saca\nla cabeza: «¡Aquí\nestá Johnny!».", "CARRIE EN EL BAILE.\nVestido de fiesta claro,\ncorona y un cubo de\nsangre falsa por\nencima. Barato, fácil\ny la foto es brutal.", "LA SUSTANCIA.\nChaqueta amarilla con\nhombreras y pendientes\ngrandes. En pareja:\nuna de Elisabeth y otra\nde Sue, con una jeringa\ngigante de juguete.", "GHOSTFACE CON\nVÍCTIMA.\nUno con túnica negra\ny máscara; el otro en\nalbornoz con el móvil\nen la oreja todo el\nrato. «¿Cuál es tu\npeli de miedo favorita?»", "M3GAN.\nVestido gris de cuello\nbebé, lazo al cuello,\npeluca castaña lisa\ny lentillas claras.\nEnsaya el baile: es\nlo que la hace ganar.", "ART THE CLOWN\n(Terrifier).\nMono blanco y negro,\ngorrito mini, cara\nblanca y boca negra.\nUna bolsa de basura\ncomo bolso. No hables\nen toda la noche.", "SAMARA (The Ring).\nCamisón blanco, pelo\nnegro largo delante de\nla cara y maquillaje\nmojado. Pide a alguien\nque vaya de tele de\ncartón.", "REGAN (El Exorcista).\nCamisón manchado,\nlentillas amarillas y\ngrietas en la piel con\nlápiz morado. Bonus:\npuré de guisantes.", "BEETLEJUICE Y LYDIA.\nTraje a rayas blanco y\nnegro con pelo verdoso;\nella, vestido de novia\nrojo con velo. Pareja\nque arrasa en fotos.", "CHUCKY Y TIFFANY.\nPeto vaquero y jersey\nde rayas con cicatrices;\nella, chupa de cuero,\nvestido de novia y\nmucho rímel corrido.", "FREDDY KRUEGER.\nJersey de rayas rojas\ny verdes, sombrero\nmarrón y un guante de\ncuchillas hecho con\npapel de aluminio.", "PEARL (Ti West).\nVestido rojo de granja\ncon lazo, coletas,\nsonrisa forzada que\nduele y un hacha. Que\nla sonrisa no se caiga.", "DANI DE MIDSOMMAR.\nVestido blanco bordado\ny una corona de flores\nENORME. Llorar es parte\ndel disfraz. Quien gana\nconcursos va de esto.", "NOSFERATU.\nGorro calvo, orejas\npuntiagudas, uñas\nlargas y abrigo negro.\nMuévete pegado a la\npared: tu sombra es\nmedio disfraz.", "ANNABELLE.\nVestido blanco con\nlazos, coletas con\nlazo rojo y cara de\nporcelana con grietas.\nMirada fija a la\ncámara en cada foto.", "PENNYWISE Y GEORGIE.\nUno de payaso con\ncuello de volantes; el\notro con chubasquero\namarillo y barco de\npapel. Globo rojo\nobligatorio.", "JASON VOORHEES.\nMáscara de hockey,\nchaqueta militar verde\ny machete de cartón.\nEl disfraz de última\nhora más digno.", "HANNIBAL Y CLARICE.\nMono azul, bozal de\nrejilla y una carretilla\nde mano dibujada; ella,\nchaqueta y placa del\nFBI. Elegante y raro.", "MICHAEL MYERS.\nMono azul mecánico,\nmáscara blanca y un\ncuchillo de cartón.\nNo corras nunca: anda.\nY quédate quieto al\nfondo de las fotos.", "LA FAMILIA ADDAMS\n(para grupo).\nMerlina, Morticia,\nGómez, el tío Lucas\ny Cosa (una mano en\nuna caja). Cada uno\nelige y salís juntos.", "BILLY (Saw).\nCara blanca con\nmofletes rojos en\nespiral, pajarita roja\ny traje negro. Graba\nmensajes en el móvil:\n«Quiero jugar...».", "LEATHERFACE.\nDelantal de carnicero,\ncamisa con corbata y\nuna máscara de cuero\nhecha con medias.\nMotosierra de cartón\nque ruja con la voz."];
@@ -2201,6 +2212,20 @@ function talkWitch(){
   if(candy<1) return say("BRUJA", "Sin caramelo no hay\nhechizo, cariño.\nVuelve con uno y te\ndiré de qué disfrazarte.", witchRec());
   pendingB="bruja"; return say("BRUJA", "Por un caramelo te digo\nun disfraz que gana\nconcursos. De verdad.\n\nPulsa A para pagarle.", witchRec());
 }
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const FROG_LINES = ["¡Croac!", "Croac. Croac.\n(Te mira como si\nsupiera algo.)", "La rana dice que\nno la beses. Que ya\nlo intentó una vez.", "¡CROAC!\n(Muy fuerte. Muy\nmaleducada.)", "Dicen que es un\ninvitado que no\nconfirmó a tiempo."];
+const ROCK_LINES = ["Una roca con musgo.\nMuy roca, la verdad.", "Debajo hay una lombriz\nque te mira mal.", "Intentas levantarla.\nLa roca gana.", "Alguien ha grabado:\n'Iris estuvo aquí'.", "Es una roca. Pero\nes TU roca."];
+const TREE_LINES = ["Sus ramas crujen\ncon el viento.", "Un búho te mira\ndesde arriba. Juzga.", "Tiene un nombre\ngrabado: 'Adri'.\nY un corazón.", "Parece que te\nseñala. Mejor\nno preguntar.", "Este árbol ha visto\nmuchas fiestas.\nNinguna buena."];
+const MUSH_LINES = ["Mejor no comerlas.\nHazme caso.", "Brillan un poquito.\nEso nunca es buena\nseñal.", "Huelen a fiesta\nde las de antes.", "Una seta te guiña\nun ojo. ¿O no?"];
+const TALUD_LINES = ["Rocas y raíces.\nMejor por la escalera.", "Escalar está muy bien.\nEsta noche, no.", "Entre las piedras\nasoma una mano.\nTe saluda."];
+const LAKE_LINES = ["El agua está quieta.\nDemasiado quieta.", "Algo ha hecho 'blub'.\nNo quieras saber qué.", "Tu reflejo va\ndisfrazado. Tú no.\nTodavía.", "Un nenúfar se mueve\nsolo. Normal."];
+const FUENTE_LINES = ["El agua susurra nombres\nque no conoces.", "Alguien ha tirado\nuna moneda. Y una\ndentadura.", "El agua sabe a hierro.\nNo la bebas.", "Si escuchas bien,\nla fuente tararea."];
+const FAROL_LINES = ["La llama tiembla\ncuando pasas.", "Una polilla da vueltas.\nLleva así desde 1950.", "Da una luz preciosa.\nPara un susto."];
+const HOG_LINES = ["Huele a castañas\ny a humo. Qué gusto.", "El fuego crepita\ncomo si se riera.", "Alguien ha quemado\nun disfraz aquí.\nEra feo."];
+const FOSA_LINES = ["Está recién cavada.\n¿Para quién será?", "Hay una pala clavada.\nY una nota: 'Vuelvo\nen 5 min'.", "Huele a tierra mojada\ny a pocas ganas.", "Tiene tu talla.\nCasualidad, seguro."];
+const MAU_LINES = ["Está cerrado.\nAlgo se mueve dentro...", "Se oye roncar\na alguien dentro.", "En la puerta pone:\n'No molestar.\nNi en 100 años'.", "Alguien llama desde\ndentro: '¿Ya es la\nfiesta?'"];
+const CAT_LINES = ["¡Miau!", "Miau...", "Prrrr. Miau.", "Se frota contra\ntu pierna. Ya eres\nsuyo.", "Te mira, te ignora\ny se lame una pata.\nRespeto.", "Tiene siete vidas.\nYa ha gastado cinco."];
+const CROW_LINES = ["¡Cra! (Te registra los\nbolsillos, no encuentra\nnada y se ofende.)", "¡Cra! (Te mira los\nbolsillos vacíos con\nauténtica pena.)", "Cra. (Sin caramelos\nno eres nadie para él.)"];
 function gossip(){
   const yes=npcs.filter(n=>n.attend==="si"), no=npcs.filter(n=>!confirmed(n));
   const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -2239,30 +2264,34 @@ function interact(){
   if(t==="S"){ if(candy<1) return say("ESPANTAPÁJAROS", "Juego al trile con los\nque pasan. Pero sin\ncaramelo no hay apuesta."); return openTrile(); }
   if(t==="H"){ const got=maybeCandy("hog",.35); if(got) return say("HOGUERA", "Entre las brasas hay\nun caramelo tostado.");
     if(candy>0){ pendingB="hoguera"; return say("HOGUERA", "Huele a castañas.\nDicen que si echas un\ncaramelo, el fuego\ncambia de color...\n\nPulsa A para echarlo."); }
-    return say("HOGUERA", "Huele a castañas\ny a humo. Qué gusto."); }
+    return say("HOGUERA", pick(HOG_LINES)); }
   if(t==="b"){ const bn=benchAt(tx,ty); if(bn){ player.sit={cx:bn.x+23, top:bn.y, base:bn.base}; player.dir="down"; return true; } }
-  if(t==="G") return say("FOSA", "Está recién cavada.\n¿Para quién será?");
-  if(t==="W"||t==="w") return say("ESTANQUE", "El agua está quieta.\nDemasiado quieta.");
+  if(t==="G") return say("FOSA", pick(FOSA_LINES));
+  if(t==="W"||t==="w") return say("ESTANQUE", pick(LAKE_LINES));
   if(t==="V"){
     if(candy<1) return say("POZO DE LOS DESEOS", "Necesitas un caramelo\npara pedir un deseo.");
     pendingB="pozo"; return say("POZO DE LOS DESEOS", "¿Echas un caramelo\npara conocer tu futuro?\n\nPulsa A para echarlo.");
   }
   if(t==="U") return talkWitch();
+  const frog=frogs.find(f=>!f.pad&&f.tx===tx&&f.ty===ty);
+  if(frog){ frog.croak=performance.now(); const got=maybeCandy("rana"+tx,.3);
+    return say("RANA", got?"¡CROAC!\n(Escupe algo pegajoso.\nEs un caramelo. Puaj.)":pick(FROG_LINES)); }
+  if(t==="D") return say("PASARELA", pick(["Las tablas crujen.\nNo mires abajo.","Alguien ha tallado:\n'No te bañes. Muerden.'","Desde aquí se ven\nojos en el agua.\nSon ranas. Seguro."]));
   if(t==="Q"){ const ghosts=npcs.filter(n=>!confirmed(n)&&n.attend!=="no").map(n=>n.nick);
-    return say("ESTANQUE DE LAS ÁNIMAS", ghosts.length ? "En el agua se reflejan\nlos que aún no han dicho\nque sí:\n\n"+ghosts.slice(0,8).join(", ")+(ghosts.length>8?"...":"") : "El agua está en calma.\nNo queda nadie por\ndecidirse. Qué bien."); }
+    return say("LAGUNA DE LAS ÁNIMAS", ghosts.length ? "En el agua se reflejan\nlos que aún no han dicho\nque sí:\n\n"+ghosts.slice(0,8).join(", ")+(ghosts.length>8?"...":"") : "El agua está en calma.\nNo queda nadie por\ndecidirse. Qué bien."); }
   if(t==="Z") return say("MENHIR", ["Unas runas brillan y\nse apagan, como si\nrespiraran.","Pone algo en un idioma\nmuy antiguo. Parece\nuna lista de invitados.","La piedra está tibia.\nAlguien ha estado\nesperando aquí mucho\ntiempo."][Math.floor(Math.random()*3)]);
-  if(t==="O"){ const got=maybeCandy("fuente",.6); return say("FUENTE", got?"En el fondo brilla algo...\n¡un caramelo!":"El agua susurra nombres\nque no conoces."); }
-  if(t==="R"||t==="r") return say("ROCA","Una roca con musgo.\nMuy roca, la verdad.");
+  if(t==="O"){ const got=maybeCandy("fuente",.6); return say("FUENTE", got?"En el fondo brilla algo...\n¡un caramelo!":pick(FUENTE_LINES)); }
+  if(t==="R"||t==="r") return say("ROCA",pick(ROCK_LINES));
   if(t==="Y" && tx===NEST.x && ty===NEST.y){
     if(crowStash<1) return say("ÁRBOL SECO","Arriba hay un nido vacío.\nHuele a plumas.");
     const n=crowStash; stash(-n); for(let i=0;i<n;i++) setCandy(candy+1); toastMsg("+"+n+" CARAMELO"+(n>1?"S":""));
     return say("NIDO DEL CUERVO","Entre las ramas hay un nido\nlleno de cosas brillantes:\nun anillo, una chapa...\n\n¡Y "+(n>1?n+" caramelos":"un caramelo")+"!\nRecuperas lo robado."); }
-  if(t==="Y") return say("ÁRBOL SECO","Sus ramas crujen\ncon el viento.");
-  if(t==="m") return say("SETAS","Mejor no comerlas.\nHazme caso.");
-  if(t==="#") return say("TALUD","Rocas y raíces.\nMejor por la escalera.");
-  if(t==="M"){ const got=maybeCandy("mau",1); return say("MAUSOLEO", got?"Por una rendija sale\nuna mano huesuda...\ny te da un caramelo.":"Está cerrado.\nAlgo se mueve dentro..."); }
+  if(t==="Y") return say("ÁRBOL SECO",pick(TREE_LINES));
+  if(t==="m") return say("SETAS",pick(MUSH_LINES));
+  if(t==="#") return say("TALUD",pick(TALUD_LINES));
+  if(t==="M"){ const got=maybeCandy("mau",1); return say("MAUSOLEO", got?"Por una rendija sale\nuna mano huesuda...\ny te da un caramelo.":pick(MAU_LINES)); }
   if(t==="L"){ if(!isLit(tx,ty)){ unlit.delete(tx+","+ty); return say("FAROL","Enciendes el farol.\nLa llama tiembla\ncuando pasas."); }
-    const got=maybeCandy("fl"+tx+","+ty,.5); return say("FAROL", got?"Junto a la llama hay\nun caramelo calentito.":"La llama tiembla\ncuando pasas."); }
+    const got=maybeCandy("fl"+tx+","+ty,.5); return say("FAROL", got?"Junto a la llama hay\nun caramelo calentito.":pick(FAROL_LINES)); }
 }
 const sessionGot = new Map();
 
