@@ -193,6 +193,12 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .tr-msg{margin:0;font-size:8px;line-height:1.9;color:#f3ead8;min-height:3.8em;white-space:pre-line}
 #tr-candy{font-size:8px;color:#ffe08a}
 
+/* Almas en pena */
+#s-almas{justify-content:center}
+.almas{flex:0 0 auto;background-color:#1e1430;gap:10px}
+#al-cv{width:100%;max-height:52dvh;aspect-ratio:272/380;object-fit:contain;image-rendering:pixelated;background:#0b0716;border:3px solid #1a1020;touch-action:none;display:block;margin:0 auto}
+.almas .tr-msg{min-height:2.2em}
+
 /* Gramola */
 #s-gramola{justify-content:center}
 .gramola{background-color:#3e2a1a;flex:0 0 auto}
@@ -366,6 +372,17 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
       <button class="pxbtn alt" id="tr-play" type="button">JUGAR · 1 CARAMELO</button>
     </div>
     <div class="board-btns"><button class="pxbtn" id="tr-b" type="button"><b class="key">B</b> CERRAR</button></div>
+  </div>
+
+  <!-- Minijuego: Almas en pena -->
+  <div class="screen bscreen" id="s-almas" hidden role="dialog" aria-labelledby="al-h">
+    <div class="board almas">
+      <div class="board-head"><h2 id="al-h">ALMAS EN PENA</h2><span id="al-score"></span></div>
+      <canvas id="al-cv" width="272" height="380" aria-label="Tablero: apunta y suelta para disparar"></canvas>
+      <p class="tr-msg" id="al-msg" aria-live="polite"></p>
+      <button class="pxbtn alt" id="al-play" type="button">JUGAR</button>
+    </div>
+    <div class="board-btns"><button class="pxbtn" id="al-b" type="button"><b class="key">B</b> CERRAR</button></div>
   </div>
 
   <!-- Gramola -->
@@ -1404,7 +1421,8 @@ for(const sp of SC.sprites){ if(sp.w<40) continue; const ty=Math.floor((sp.base-
   for(let x=x0;x<=x1;x++){ const l=MAP[ty]&&MAP[ty][x]; if(l && !"=EB".includes(l) && SC.walk[ty][x]==="1") OBJ[x+","+ty]=letter||"o"; } }
 /* Gramola: al lado del camino de entrada, enfrente del tablón */
 const GRAMO = {x:13, y:24}; OBJ[GRAMO.x+","+GRAMO.y]="J";
-const CALDERO = {x:44, y:13}; OBJ[CALDERO.x+","+CALDERO.y]="U";
+const CALDERO = {x:44, y:13};
+const MAQUINA = {x:21, y:15}; OBJ[MAQUINA.x+","+MAQUINA.y]="A"; OBJ[CALDERO.x+","+CALDERO.y]="U";
 const SPOTIFY_URL = "https://open.spotify.com/playlist/1ido1a7hGXDYKRhZRajsIG?si=_A5kMq_CT0eYuZzUEq-tPw&utm_source=copy-link&pi=jhTGYGu-SfeVi&pt=34e9512b78a712b1f544106b251e8825";
 const tileAt = (x,y) => OBJ[x+","+y] || (MAP[y]&&MAP[y][x]);
 /* las setas se pisan */
@@ -1760,6 +1778,21 @@ function drawFrogs(L, g, camX, camY, now){
     L.push({b:f.y*TS+1, d:()=>g.drawImage(spr,X,Y)});
   }
 }
+/* Maquinita embrujada (minijuego de almas de colores) */
+const MAQ_SPR = (()=>{ const c=document.createElement("canvas"); c.width=24; c.height=40; const x=c.getContext("2d");
+  const P=(a,b,w,h,col)=>{ x.fillStyle=col; x.fillRect(a,b,w,h); };
+  P(2,38,20,2,"rgba(4,4,12,.45)");
+  P(2,2,20,36,"#120c1c"); P(3,3,18,34,"#3b2558"); P(3,3,18,2,"#5a3a84"); P(3,3,2,34,"#4a2f6e");
+  P(4,1,16,4,"#120c1c"); P(5,2,14,2,"#ff9a3c");
+  P(5,8,14,12,"#0b0716"); P(6,9,12,10,"#1a1030");
+  P(4,22,16,6,"#2a1a40"); P(7,24,2,2,"#ff5d6c"); P(11,23,2,2,"#7fd1a0"); P(15,24,2,2,"#6fc3ff");
+  P(4,30,16,6,"#2a1a40"); P(9,32,6,2,"#120c1c");
+  return c; })();
+const MAQ_COLS=["#ff9a3c","#b48cff","#7fd1a0","#6fc3ff"];
+function drawMaquina(g, camX, camY, now){
+  const X=MAQUINA.x*TS+4-camX, Y=MAQUINA.y*TS+30-40-camY; g.drawImage(MAQ_SPR,X,Y);
+  for(let i=0;i<4;i++){ const k=(now/700+i*.25)%1; g.fillStyle=MAQ_COLS[i]; g.fillRect(X+7+((i*3+Math.floor(k*4))%9),Y+17-Math.floor(k*8),2,2); }
+}
 /* Caldero de la bruja: verde burbujeante */
 function drawCaldero(g, camX, camY, now){
   const X=CALDERO.x*TS+6-camX, Y=CALDERO.y*TS+12-camY;
@@ -1853,6 +1886,7 @@ function render(now){
   for(const c of chars){ if(c.critter || !allIn(c) || (c.isMe && player.sit && PET_KIND[petOf(c)]!=="orbita")) continue; pushPet(L, g, c, camX, camY, now); }
   L.push({b:GATE.base, d:()=>drawGateW(g, camX, camY, now)});
   L.push({b:GRAMO.y*TS+30, d:()=>drawGramo(g, camX, camY, now)});
+  L.push({b:MAQUINA.y*TS+30, d:()=>drawMaquina(g, camX, camY, now)});
   if(camX+VW > 40*TS){ L.push({b:CALDERO.y*TS+30, d:()=>drawCaldero(g, camX, camY, now)}); drawFrogs(L, g, camX, camY, now); }
   if(camX+VW > 32*TS){
     CLARO.stones.forEach(([sx,sy],k)=>{ const spr=MENHIR_SPR[k%2]; L.push({b:sy*TS+30, d:()=>g.drawImage(spr, sx*TS+5-camX, sy*TS+30-spr.height+3-camY)}); });
@@ -1868,6 +1902,7 @@ function render(now){
     p[j]=p[j]*(1+1.35*a)+58*a; p[j+1]=p[j+1]*(1+.38*a)+20*a; p[j+2]=p[j+2]*(1-.3*a); } g.putImageData(img,0,0); }
   // fuego fatuo y luciérnagas del lago
   g.globalCompositeOperation="lighter";
+  { const mx=MAQUINA.x*TS+16-camX, my=MAQUINA.y*TS+4-camY; if(mx>-60&&mx<VW+60&&my>-60&&my<VH+60){ const lg=g.createRadialGradient(mx,my,0,mx,my,34); lg.addColorStop(0,`rgba(180,120,255,${.28+.06*Math.sin(t*5)})`); lg.addColorStop(1,"rgba(180,120,255,0)"); g.fillStyle=lg; g.fillRect(mx-34,my-34,68,68); } }
   if(camX+VW > 30*TS){ // luz fría y mágica del claro
     const glow=(x,y,r,col,a)=>{ const lg=g.createRadialGradient(x,y,0,x,y,r); lg.addColorStop(0,`rgba(${col},${a})`); lg.addColorStop(1,`rgba(${col},0)`); g.fillStyle=lg; g.fillRect(x-r,y-r,r*2,r*2); };
     glow(CLARO.lx*TS-camX, CLARO.ly*TS-camY, 110, "160,110,255", .2+.05*Math.sin(t*1.3));
@@ -1974,7 +2009,7 @@ function update(now){
   if(mode==="play"){ const ic=inClaro(player.x,player.y); if(ic&&!inClaroNow) areaBanner(); inClaroNow=ic; }
   updatePet(now);
   if(now>(update.vt||0)){ update.vt=now+250; const d=Math.hypot(player.fx-GRAMO.x, player.fy-GRAMO.y); MUSIC.setVol(mode==="play" ? .45*(.35+.65*Math.max(0,1-d/14)) : .3); }
-  if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
+  if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-almas").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
     advance(player, now, player.from&&player.from[1]===31&&player.y===28?900:runHeld?95:170);
     if(LIVE && !player.moving && (player.x!==lastPos.x || player.y!==lastPos.y)){
       lastPos={x:player.x,y:player.y}; clearTimeout(moveTimer);
@@ -2094,6 +2129,7 @@ addEventListener("keydown",e=>{
   if(e.target.closest && e.target.closest("input,textarea,[contenteditable]")) return;
   if(KEYS[e.key] && mode==="play"){ keyDir=KEYS[e.key]; syncHeld(); e.preventDefault(); }
   if(!$("#s-trile").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeTrile(); return; }
+  if(!$("#s-almas").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeAlmas(); else almasKey(e); return; }
   if(!$("#s-gramola").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeGramola(); return; }
   if(!$("#s-board").hidden){ if(e.key==="Escape"||e.key==="b") boardBack(); if(e.key==="y"&&$("#note-new").hidden) newNote(); return; }
   if((e.key===" "||e.key==="Enter"||e.key==="j") && mode==="play"){ e.preventDefault(); pressA(); }
@@ -2127,7 +2163,7 @@ function pressA(){
   if(player.sit){ player.sit=null; return; }
   if(!$("#dialog").hidden){ if(typingNow()) return finishTyping(); const pb=pendingB; closeDialog(); if(pb) doPending(pb); return; }
   const r=interact();
-  const opened = r===true || !$("#dialog").hidden || !$("#s-board").hidden || !$("#s-gramola").hidden || !$("#s-trile").hidden || player.sit;
+  const opened = r===true || !$("#dialog").hidden || !$("#s-board").hidden || !$("#s-gramola").hidden || !$("#s-trile").hidden || !$("#s-almas").hidden || player.sit;
   if(!opened && !player.jump) player.jump=performance.now();
 }
 let runHeld=false;
@@ -2251,6 +2287,7 @@ function gossip(){
   const opts=[];
   if(yes.length){ const a=pick(yes); opts.push(`Me han dicho que ${a.nick}\nviene seguro.`); const p=yes.filter(n=>n.party==="si"); if(p.length) opts.push(`${pick(p).nick} se queda\nhasta el final. Seguro.`); }
   if(no.length) opts.push(`${pick(no).nick} aún no ha dicho\nnada. Le guardo sitio...`);
+  opts.push("Junto al estanque han\npuesto una maquinita.\nDicen que atrapa almas.\nY regala caramelos.");
   opts.push("En el claro de detrás\ndel puente vive una\nbruja. Sabe mucho\nde disfraces...");
   if(crowStash>0) opts.push("A los cuervos les gusta\nlo que brilla. Y nunca\nolvidan dónde lo esconden.");
   opts.push(`Ya van ${yes.length + (me&&me.attend==="si"?1:0)} confirmados.\nVoy a tener que cavar más.`);
@@ -2292,6 +2329,7 @@ function interact(){
     pendingB="pozo"; return say("POZO DE LOS DESEOS", "¿Echas un caramelo\npara conocer tu futuro?\n\nPulsa A para echarlo.");
   }
   if(t==="U") return talkWitch();
+  if(t==="A"){ openAlmas(); return true; }
   const frog=frogs.find(f=>!f.pad&&f.tx===tx&&f.ty===ty);
   if(frog){ frog.croak=performance.now(); const got=maybeCandy("rana"+tx,.3);
     return say("RANA", got?"¡CROAC!\n(Escupe algo pegajoso.\nEs un caramelo. Puaj.)":pick(FROG_LINES)); }
@@ -2353,6 +2391,91 @@ async function pickTrile(h){
   paintTrileCandy(); $("#tr-play").style.visibility=""; $("#tr-play").textContent="OTRA VEZ · 1 CARAMELO"; $("#tr-play").focus();
 }
 $("#tr-play").onclick=playTrile; $("#tr-b").onclick=closeTrile;
+
+/* ================= ALMAS EN PENA =================
+   Minijuego de burbujas: apunta, suelta y junta 3 almas del mismo color para liberarlas.
+   Premio: 1 caramelo cada 15 almas liberadas (máx. 3 por partida) y 2 extra si limpias el tablero. */
+const AL = {R:16, cols:8, cv:null, x:null, grid:[], par:0, shots:0, cur:0, next:0, ball:null, aim:-Math.PI/2, run:false, freed:0, paid:0, raf:0, over:false, lastPrize:0};
+const AL_W=272, AL_H=380, AL_RH=16*Math.sqrt(3), AL_LOSE=AL_H-64;
+const alOff = r => ((r+AL.par)%2)*AL.R;
+const alPos = (r,c) => [AL.R+c*2*AL.R+alOff(r), AL.R+r*AL_RH];
+const alColsIn = r => alOff(r) ? AL.cols-0 : AL.cols;
+function alNeighbors(r,c){ const o=alOff(r)?0:-1, out=[[r,c-1],[r,c+1],[r-1,c+o],[r-1,c+o+1],[r+1,c+o],[r+1,c+o+1]];
+  return out.filter(([a,b])=>a>=0&&b>=0&&b<AL.cols&&AL.grid[a]&&AL.grid[a][b]!=null); }
+function alColorsLeft(){ const set=new Set(); AL.grid.forEach(row=>row.forEach(v=>{ if(v!=null) set.add(v); })); return set.size?[...set]:[0,1,2,3]; }
+function alRand(){ const cs=alColorsLeft(); return cs[Math.floor(Math.random()*cs.length)]; }
+function openAlmas(){ closeDialog(); $("#s-almas").hidden=false; AL.cv=$("#al-cv"); AL.x=AL.cv.getContext("2d");
+  alNew(); $("#al-msg").textContent="Apunta tocando arriba y suelta para lanzar. Junta 3 almas del mismo color."; $("#al-play").hidden=true; alLoop(); }
+function closeAlmas(){ $("#s-almas").hidden=true; AL.run=false; cancelAnimationFrame(AL.raf); }
+function alNew(){ AL.grid=[]; AL.par=0; AL.shots=0; AL.freed=0; AL.paid=0; AL.over=false; AL.ball=null;
+  for(let r=0;r<5;r++){ AL.grid[r]=[]; for(let c=0;c<AL.cols;c++) AL.grid[r][c]=Math.floor(Math.random()*4); }
+  AL.cur=alRand(); AL.next=alRand(); AL.run=true; alScore(); }
+function alScore(){ $("#al-score").textContent=`${AL.freed} ALMAS · +${AL.paid}`; }
+function alAimAt(ev){ const r=AL.cv.getBoundingClientRect(), x=(ev.clientX-r.left)*AL_W/r.width, y=(ev.clientY-r.top)*AL_H/r.height;
+  let a=Math.atan2(y-(AL_H-22), x-AL_W/2); a=Math.max(-Math.PI+.18, Math.min(-.18, a)); AL.aim=a; }
+function alShoot(){ if(!AL.run||AL.ball||AL.over) return; haptic(10); const [sx,sy]=[AL_W/2, AL_H-22];
+  AL.ball={x:sx,y:sy,vx:Math.cos(AL.aim)*9,vy:Math.sin(AL.aim)*9,col:AL.cur}; AL.cur=AL.next; AL.next=alRand(); }
+function almasKey(e){ if(e.key==="ArrowLeft") AL.aim=Math.max(-Math.PI+.18,AL.aim-.08); else if(e.key==="ArrowRight") AL.aim=Math.min(-.18,AL.aim+.08); else if(e.key===" "||e.key==="Enter"||e.key==="j"){ e.preventDefault(); alShoot(); } }
+(function(){ const cv=$("#al-cv"); let down=false;
+  cv.addEventListener("pointerdown",e=>{ e.preventDefault(); down=true; alAimAt(e); try{cv.setPointerCapture(e.pointerId)}catch(_){} });
+  cv.addEventListener("pointermove",e=>{ if(down) alAimAt(e); });
+  cv.addEventListener("pointerup",e=>{ if(!down) return; down=false; alAimAt(e); alShoot(); });
+  cv.addEventListener("pointercancel",()=>{ down=false; }); })();
+$("#al-b").onclick=closeAlmas; $("#al-play").onclick=()=>{ alNew(); $("#al-play").hidden=true; $("#al-msg").textContent="¡A liberar almas!"; };
+function alSnap(b){
+  let best=null, bd=1e9;
+  const r0=Math.max(0,Math.round((b.y-AL.R)/AL_RH));
+  for(let r=Math.max(0,r0-1); r<=r0+1; r++){ if(!AL.grid[r]) AL.grid[r]=[]; for(let c=0;c<AL.cols;c++){ if(AL.grid[r][c]!=null) continue; const [x,y]=alPos(r,c);
+    if(x>AL_W-AL.R+1) continue; const d=Math.hypot(x-b.x,y-b.y); if(d<bd){ bd=d; best=[r,c]; } } }
+  if(!best) return;
+  const [r,c]=best; AL.grid[r][c]=b.col;
+  // grupo del mismo color
+  const seen=new Set([r+","+c]), q=[[r,c]], grp=[];
+  while(q.length){ const [a,bb]=q.pop(); grp.push([a,bb]); for(const [na,nb] of alNeighbors(a,bb)) if(!seen.has(na+","+nb) && AL.grid[na][nb]===b.col){ seen.add(na+","+nb); q.push([na,nb]); } }
+  let freed=0;
+  if(grp.length>=3){ grp.forEach(([a,bb])=>AL.grid[a][bb]=null); freed+=grp.length;
+    // las que quedan colgando se caen
+    const keep=new Set(), st=[]; (AL.grid[0]||[]).forEach((v,cc)=>{ if(v!=null){ keep.add("0,"+cc); st.push([0,cc]); } });
+    while(st.length){ const [a,bb]=st.pop(); for(const [na,nb] of alNeighbors(a,bb)) if(!keep.has(na+","+nb)){ keep.add(na+","+nb); st.push([na,nb]); } }
+    AL.grid.forEach((row,a)=>row.forEach((v,bb)=>{ if(v!=null && !keep.has(a+","+bb)){ row[bb]=null; freed++; } }));
+    haptic(25); }
+  AL.freed+=freed;
+  AL.shots++;
+  if(!freed && AL.shots%6===0){ AL.grid.unshift(Array.from({length:AL.cols},()=>alRand())); AL.par^=1; }
+  while(AL.grid.length && AL.grid[AL.grid.length-1].every(v=>v==null)) AL.grid.pop();
+  alPrize(); alScore();
+  const empty=AL.grid.every(row=>row.every(v=>v==null));
+  if(empty) return alEnd(true);
+  const lowest=AL.grid.length-1; if(lowest>=0 && alPos(lowest,0)[1]+AL.R>AL_LOSE) return alEnd(false);
+}
+function alPrize(){ const want=Math.min(3, Math.floor(AL.freed/15)); while(AL.paid<want){ AL.paid++; giveCandy(); } }
+function alEnd(win){ AL.over=true;
+  if(win){ setCandy(candy+1); setCandy(candy+1); AL.paid+=2; }
+  alScore(); $("#al-msg").textContent = win ? `¡Tablero limpio! Has liberado ${AL.freed} almas y ganas ${AL.paid} caramelos.` : `Las almas te han alcanzado. Liberaste ${AL.freed}${AL.paid?` y ganas ${AL.paid} caramelo${AL.paid>1?"s":""}`:""}.`;
+  $("#al-play").hidden=false; $("#al-play").textContent="OTRA PARTIDA"; }
+function alBubble(x,y,col,r=AL.R){ const X=AL.x; X.fillStyle="#120c1c"; X.beginPath(); X.arc(x,y,r-.5,0,7); X.fill();
+  X.fillStyle=MAQ_COLS[col]; X.beginPath(); X.arc(x,y,r-2.5,0,7); X.fill();
+  X.fillStyle="rgba(0,0,0,.22)"; X.beginPath(); X.arc(x+3,y+4,r-6,0,7); X.fill();
+  X.fillStyle="rgba(255,255,255,.75)"; X.fillRect(Math.round(x-6),Math.round(y-7),4,3); X.fillStyle="#120c1c"; X.fillRect(Math.round(x-4),Math.round(y-1),2,3); X.fillRect(Math.round(x+2),Math.round(y-1),2,3); }
+function alLoop(){
+  if($("#s-almas").hidden) return;
+  const X=AL.x; X.clearRect(0,0,AL_W,AL_H); X.imageSmoothingEnabled=false;
+  X.fillStyle="#0b0716"; X.fillRect(0,0,AL_W,AL_H);
+  X.fillStyle="rgba(255,93,108,.35)"; X.fillRect(0,AL_LOSE,AL_W,2);
+  AL.grid.forEach((row,r)=>row.forEach((v,c)=>{ if(v!=null){ const [x,y]=alPos(r,c); alBubble(x,y,v); } }));
+  const b=AL.ball;
+  if(b){ for(let k=0;k<2;k++){ b.x+=b.vx/2; b.y+=b.vy/2;
+      if(b.x<AL.R){ b.x=AL.R; b.vx*=-1; } if(b.x>AL_W-AL.R){ b.x=AL_W-AL.R; b.vx*=-1; }
+      let hit=b.y<AL.R;
+      if(!hit) for(let r=0;r<AL.grid.length&&!hit;r++) for(let c=0;c<AL.cols;c++){ if(AL.grid[r][c]==null) continue; const [x,y]=alPos(r,c); if(Math.hypot(x-b.x,y-b.y)<AL.R*1.8){ hit=true; break; } }
+      if(hit){ AL.ball=null; alSnap(b); break; } }
+    if(AL.ball) alBubble(b.x,b.y,b.col); }
+  // lanzador
+  const sx=AL_W/2, sy=AL_H-22;
+  if(!AL.over){ X.strokeStyle="rgba(232,220,255,.35)"; X.setLineDash([4,6]); X.beginPath(); X.moveTo(sx,sy); X.lineTo(sx+Math.cos(AL.aim)*110, sy+Math.sin(AL.aim)*110); X.stroke(); X.setLineDash([]);
+    if(!AL.ball) alBubble(sx,sy,AL.cur); alBubble(sx+46,sy+6,AL.next,10); }
+  AL.raf=requestAnimationFrame(alLoop);
+}
 
 /* ================= GRAMOLA ================= */
 function openGramola(){ closeDialog(); paintGramola(); $("#gr-spot").href=SPOTIFY_URL; $("#s-gramola").hidden=false; $("#gr-b").focus(); }
