@@ -304,8 +304,8 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
     <button class="d" data-d="down" aria-label="Abajo"><i></i></button>
   </div>
   <div class="ab" id="ab" hidden>
-    <div class="abw bw"><button class="bbtn" id="bbtn" type="button" aria-label="B: saltar o encender">B</button><span>SALTAR</span></div>
-    <div class="abw aw"><button class="abtn" id="abtn" type="button" aria-label="A: interactuar">A</button><span>HABLAR</span></div>
+    <div class="abw bw"><button class="bbtn" id="bbtn" type="button" aria-label="B: correr (mantener) o pasar texto">B</button><span>CORRER</span></div>
+    <div class="abw aw"><button class="abtn" id="abtn" type="button" aria-label="A: hablar, usar o saltar">A</button><span>HABLAR</span></div>
   </div>
   <span class="hint" id="hint" hidden>Toca a alguien</span>
 
@@ -401,7 +401,7 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
         <ol class="steps">
           <li><b>1</b><span>Esta invitación es solo tuya. Hasta que respondas, eres un fantasma más vagando por el cementerio.</span></li>
           <li><b>2</b><span>Confirma que vienes y resucitarás con tu propio aspecto.</span></li>
-          <li><b>3</b><span>Pasea, toca a los demás para ver quién viene y rebusca: hay caramelos escondidos por todas partes.</span></li>
+          <li><b>3</b><span>Pasea, toca a los demás para ver quién viene y rebusca: hay caramelos escondidos por todas partes. Con A hablas; mantén B para correr.</span></li>
         </ol>
         <div class="ley" role="note"><span class="ley-k">LEY DEL CEMENTERIO</span><p>EL 31 SE VIENE DISFRAZADO</p><small>A la fiesta de verdad, no en el juego. Sin disfraz no se cruza la verja. Y en la Oversize el mejor disfraz se lleva 100 €.</small></div>
         <button class="tbtn primary" id="intro-ok" type="button"><i>▶</i><span><b>¡VAMOS!</b></span></button>
@@ -1382,6 +1382,7 @@ for(const sp of SC.sprites){ if(sp.w<40) continue; const ty=Math.floor((sp.base-
   for(let x=x0;x<=x1;x++){ const l=MAP[ty]&&MAP[ty][x]; if(l && !"=EB".includes(l) && SC.walk[ty][x]==="1") OBJ[x+","+ty]=letter||"o"; } }
 /* Gramola: al lado del camino de entrada, enfrente del tablón */
 const GRAMO = {x:13, y:24}; OBJ[GRAMO.x+","+GRAMO.y]="J";
+const CALDERO = {x:43, y:12}; OBJ[CALDERO.x+","+CALDERO.y]="U";
 const SPOTIFY_URL = "https://open.spotify.com/playlist/1ido1a7hGXDYKRhZRajsIG?si=_A5kMq_CT0eYuZzUEq-tPw&utm_source=copy-link&pi=jhTGYGu-SfeVi&pt=34e9512b78a712b1f544106b251e8825";
 const tileAt = (x,y) => OBJ[x+","+y] || (MAP[y]&&MAP[y][x]);
 /* las setas se pisan */
@@ -1416,6 +1417,7 @@ const critters = [
   {kind:"esqueleto", rec:{char:"calavera",color:"#efe8d6",attend:"si"}, x:5,y:8, speed:320, rad:1},
   {kind:"cuervo", rec:{char:"cuervo",color:"#17122a",attend:"si"}, x:16,y:2, speed:150, rad:2},
   {kind:"sepulturero", rec:{char:"base",nick:"Sepulturero",avatar:"sepulturero",attend:"si"}, x:4,y:19, speed:400, rad:0},
+  {kind:"bruja", rec:{char:"base",nick:"Bruja",avatar:"bruja",attend:"si",party:"si",hatStyle:3,faceStyle:-1}, x:44,y:12, speed:400, rad:0},
 ].map(c=>({...c, fx:c.x, fy:c.y, hx:c.x, hy:c.y, dir:"down", moving:false, t0:0, from:null, next:performance.now()+Math.random()*3000}));
 const wisp = {x:21,y:26, fx:21, fy:26, tx:21, ty:26};
 const WISP_SPOTS = [[21,26],[29,13],[9,27],[26,8],[17,3],[7,12],[5,20],[24,24],[2,17],[27,22]];
@@ -1513,6 +1515,8 @@ function drawSprite(g, r, dir, frame, x, y, s, shadow=true){
 const NIGHTK = SC.night.figuras, PAD = GEN.ACC_PAD;
 const norm = s => (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().replace(/\s+/g,"-");
 const SPECIAL = {
+  bruja:{cuerpo:"m",piel:"#b9d4a6",ojos:{tipo:"almendra",color:"#7a2a8a"},cejas:"arqueada",boca:"picara",pelo:{estilo:"largo",color:"#2a1a30",textura:"liso"},
+    arriba:{tipo:"vestido",color:"#3b2558",midi:true},abajo:{tipo:"piernas",color2:"#1d1520"},zapatos:{tipo:"bota",color:"#1d1520"}},
   sepulturero:{cuerpo:"h",piel:"#dcb59c",ojos:{tipo:"tranquilo",color:"#3a2a22"},cejas:"gruesa",boca:"neutra",barba:"completa",colorBarba:"#9a96a0",
     pelo:{estilo:"rapado",color:"#9a96a0"},arriba:{tipo:"sudadera",color:"#3b3558",color2:"#2a2533"},abajo:{tipo:"pantalon",color:"#2a2530"},zapatos:{tipo:"bota",color:"#3a2a22"}}
 };
@@ -1717,6 +1721,16 @@ const GRAMO_SPR = [0,1,2,3].map(fr=>{
   return c;
 });
 const gramoNotes=[]; let gramoNextNote=0;
+/* Caldero de la bruja: verde burbujeante */
+function drawCaldero(g, camX, camY, now){
+  const X=CALDERO.x*TS+6-camX, Y=CALDERO.y*TS+12-camY;
+  g.fillStyle="rgba(4,4,12,.45)"; g.fillRect(X+1,Y+17,20,3);
+  g.fillStyle="#3a2a1a"; g.fillRect(X+3,Y+15,2,4); g.fillRect(X+16,Y+15,2,4);
+  g.fillStyle="#120e18"; g.fillRect(X,Y+3,21,13); g.fillRect(X+2,Y+1,17,2);
+  g.fillStyle="#2a2436"; g.fillRect(X+2,Y+6,4,7);
+  g.fillStyle="#3fd36a"; g.fillRect(X+2,Y+2,17,3); g.fillStyle="#9dff9a"; g.fillRect(X+5,Y+2,4,1);
+  for(let i=0;i<3;i++){ const k=((now/900+i*.37)%1), bx=X+5+i*5, by=Y+1-k*12; g.fillStyle=`rgba(150,255,150,${1-k})`; g.fillRect(Math.round(bx),Math.round(by),2,2); }
+}
 /* Menhires del claro (dos tamaños) y setas que brillan */
 const RUNES = [[[9,12],[10,12],[11,12],[10,13],[10,14],[9,15],[11,15]],[[8,14],[9,15],[10,16],[11,15],[12,14],[10,17],[10,18]]];
 const MENHIR_SPR = [40,34].map((h,k)=>{
@@ -1800,6 +1814,7 @@ function render(now){
   for(const c of chars){ if(c.critter || !allIn(c) || (c.isMe && player.sit && PET_KIND[petOf(c)]!=="orbita")) continue; pushPet(L, g, c, camX, camY, now); }
   L.push({b:GATE.base, d:()=>drawGateW(g, camX, camY, now)});
   L.push({b:GRAMO.y*TS+30, d:()=>drawGramo(g, camX, camY, now)});
+  if(camX+VW > 40*TS) L.push({b:CALDERO.y*TS+30, d:()=>drawCaldero(g, camX, camY, now)});
   if(camX+VW > 32*TS){
     CLARO.stones.forEach(([sx,sy],k)=>{ const spr=MENHIR_SPR[k%2]; L.push({b:sy*TS+30, d:()=>g.drawImage(spr, sx*TS+5-camX, sy*TS+30-spr.height+3-camY)}); });
     for(const [mx,my] of CLARO.mush) L.push({b:my*TS, d:()=>g.drawImage(MUSH_SPR, Math.round(mx*TS-camX), Math.round(my*TS-camY))}); }
@@ -1819,6 +1834,7 @@ function render(now){
     glow(CLARO.cx*TS-camX, CLARO.cy*TS+4-camY, 95, "160,110,255", .2+.05*Math.sin(t*1.3));
     CLARO.stones.forEach(([sx,sy],k)=>{ const pulse=.5+.5*Math.sin(t*1.7+k*1.3); glow(sx*TS+16-camX, sy*TS+30-MENHIR_SPR[k%2].height+20-camY, 22, "190,120,255", .18+.3*pulse);
       if(pulse>.2){ g.fillStyle=`rgba(220,170,255,${.35+.6*pulse})`; RUNES[k%2].forEach(([rx,ry])=>g.fillRect(sx*TS+5+rx-camX, sy*TS+30-MENHIR_SPR[k%2].height+3+ry+(k%2?0:2)-camY,1,1)); } });
+    glow(CALDERO.x*TS+16-camX, CALDERO.y*TS+12-camY, 30, "90,255,130", .22+.08*Math.sin(t*3));
     CLARO.mush.forEach(([mx,my],k)=>glow(mx*TS+3-camX, my*TS+2-camY, 14, "150,170,255", .22+.1*Math.sin(t*2+k)));
     for(let i=0;i<22;i++){ const a=t*.25+i*2.39, rr=(i%7)*.8+1.2;
       const fx=(CLARO.cx+Math.cos(a+i)*rr*1.1+Math.sin(t*.7+i)*.4)*TS-camX, fy=(CLARO.cy+Math.sin(a*1.3+i)*rr+Math.cos(t*.5+i)*.3)*TS-camY;
@@ -1920,7 +1936,7 @@ function update(now){
   updatePet(now);
   if(now>(update.vt||0)){ update.vt=now+250; const d=Math.hypot(player.fx-GRAMO.x, player.fy-GRAMO.y); MUSIC.setVol(mode==="play" ? .45*(.35+.65*Math.max(0,1-d/14)) : .3); }
   if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
-    advance(player, now, player.from&&player.from[1]===31&&player.y===28?900:170);
+    advance(player, now, player.from&&player.from[1]===31&&player.y===28?900:runHeld?95:170);
     if(LIVE && !player.moving && (player.x!==lastPos.x || player.y!==lastPos.y)){
       lastPos={x:player.x,y:player.y}; clearTimeout(moveTimer);
       moveTimer=setTimeout(()=>call("halloween_move",{p_x:player.x,p_y:player.y,p_dir:player.dir}),1500);
@@ -2042,17 +2058,18 @@ addEventListener("keydown",e=>{
   if(!$("#s-gramola").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeGramola(); return; }
   if(!$("#s-board").hidden){ if(e.key==="Escape"||e.key==="b") boardBack(); if(e.key==="y"&&$("#note-new").hidden) newNote(); return; }
   if((e.key===" "||e.key==="Enter"||e.key==="j") && mode==="play"){ e.preventDefault(); pressA(); }
-  if((e.key==="k"||e.key==="Shift") && mode==="play"){ e.preventDefault(); pressB(); }
+  if((e.key==="k"||e.key==="Shift") && mode==="play" && !e.repeat){ e.preventDefault(); pressB(); }
   if(e.key==="Escape") closeDialog();
 });
-addEventListener("keyup",e=>{ if(KEYS[e.key]===keyDir){ keyDir=null; syncHeld(); } });
-function pressA(){ if(!$("#dialog").hidden) closeDialog(); else interact(); }
-function pressB(){
-  if(player.sit){ player.sit=null; closeDialog(); return; }
-  const pb=pendingB;
-  if(!$("#dialog").hidden){ closeDialog(); if(!pb) return; }
-  pendingB=null;
+addEventListener("keyup",e=>{ if(KEYS[e.key]===keyDir){ keyDir=null; syncHeld(); } if(e.key==="k"||e.key==="Shift") runHeld=false; });
+/* Mandos estilo Game Boy: A = hablar / usar / confirmar (y saltar si no hay nada delante).
+   B = correr mientras se mantiene, y en los textos pasar rápido o cerrar (y decir que no). */
+function doPending(pb){
   if(pb && candy>0){
+    if(pb==="bruja"){
+      if(LIVE){ call("halloween_witch").then(r=>{ if(!r||!r.ok){ say("BRUJA","El caldero no responde.\nPrueba otra vez.",witchRec()); return; } setCandy(r.candy,false); say("BRUJA",r.idea,witchRec()); });
+        return say("BRUJA","Remueve el caldero...\n¡Burbujas verdes!",witchRec()); }
+      setCandy(candy-1); return say("BRUJA", WITCH_IDEAS[Math.floor(Math.random()*WITCH_IDEAS.length)], witchRec()); }
     if(pb==="pozo"){ setCandy(candy-1); return say("POZO DE LOS DESEOS", "Plof...\n\n"+PREDICTIONS[Math.floor(Math.random()*PREDICTIONS.length)]); }
     if(pb==="dados"){ const r=()=>1+Math.floor(Math.random()*6), a=r()+r(), b=r()+r();
       let msg=`Tú sacas ${a}.\nEl esqueleto saca ${b}.\n\n`;
@@ -2064,16 +2081,27 @@ function pressB(){
     if(pb==="hoguera"){ setCandy(candy-1); const opts=FIRE_COLORS.map((_,i)=>i).filter(i=>i!==fireTint.i); const i=opts[Math.floor(Math.random()*opts.length)];
       fireTint={i, until:performance.now()+40000}; return say("HOGUERA", "¡FSSSHHH!\n\nLas llamas se vuelven\n"+FIRE_COLORS[i].name+"."); }
   }
-  const [dx,dy]=D[player.dir], tx=player.x+dx, ty=player.y+dy, t=tileAt(tx,ty);
-  if(t==="b"){ const bn=benchAt(tx,ty); if(bn){ player.sit={cx:bn.x+23, top:bn.y, base:bn.base}; player.dir="down"; return; } }
-  if(t==="P"||t==="L"){ const k=tx+","+ty; if(unlit.has(k)) unlit.delete(k); else unlit.add(k); return; }
-  if(!player.jump) player.jump=performance.now();
+}
+const typingNow = () => sayFull && $("#dlg-txt").textContent.length < sayFull.length;
+function finishTyping(){ clearInterval(typer); $("#dlg-txt").textContent = sayFull; }
+function pressA(){
+  if(player.sit){ player.sit=null; return; }
+  if(!$("#dialog").hidden){ if(typingNow()) return finishTyping(); const pb=pendingB; closeDialog(); if(pb) doPending(pb); return; }
+  const r=interact();
+  const opened = r===true || !$("#dialog").hidden || !$("#s-board").hidden || !$("#s-gramola").hidden || !$("#s-trile").hidden || player.sit;
+  if(!opened && !player.jump) player.jump=performance.now();
+}
+let runHeld=false;
+function pressB(){
+  if(player.sit){ player.sit=null; return; }
+  if(!$("#dialog").hidden){ if(typingNow()) finishTyping(); else closeDialog(); return; }
+  runHeld=true;
 }
 /* A y B responden al tocar (no al soltar) y funcionan mientras otro dedo mueve la cruceta */
 [["#abtn",pressA],["#bbtn",pressB]].forEach(([sel,fn])=>{
   const b=$(sel);
   b.addEventListener("pointerdown",e=>{ e.preventDefault(); b.classList.add("on"); fn(); });
-  ["pointerup","pointercancel","pointerleave"].forEach(t=>b.addEventListener(t,()=>b.classList.remove("on")));
+  ["pointerup","pointercancel","pointerleave"].forEach(t=>b.addEventListener(t,()=>{ b.classList.remove("on"); if(sel==="#bbtn") runHeld=false; }));
   b.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); e.stopPropagation(); fn(); } });
 });
 
@@ -2148,11 +2176,12 @@ function talkCritter(c){
   if(c.kind==="cuervo"){
     if(candy<1) return say("CUERVO", "¡Cra! (Te registra los\nbolsillos, no encuentra\nnada y se ofende.)", c.rec);
     setCandy(candy-1); stash(1); toastMsg("¡EL CUERVO TE HA ROBADO!", true);
-    if(candy>0){ pendingB="cuervo"; return say("CUERVO", "¡Cra! Se lo traga entero.\n\nDame otro y te cuento\nun secreto de la fiesta.\n(Pulsa B para dárselo)", c.rec); }
+    if(candy>0){ pendingB="cuervo"; return say("CUERVO", "¡Cra! Se lo traga entero.\n\nDame otro y te cuento\nun secreto de la fiesta.\n(Pulsa A para dárselo)", c.rec); }
     return say("CUERVO", "¡Cra! Se lo guarda en\nel pico y mira de reojo\nhacia un árbol seco.\n\nSi tuvieras otro, te\ncontaría un secreto...", c.rec); }
   if(c.kind==="sepulturero") return say("SEPULTURERO", gossip(), c.rec);
+  if(c.kind==="bruja") return talkWitch();
   if(c.kind==="esqueleto"){ const got=maybeCandy(ck,.7); if(got) return say("ESQUELETO", "Toma, a mí no me\nentra nada. Literal.", c.rec);
-    if(candy>0 && Math.random()<.6){ pendingB="dados"; return say("ESQUELETO", "¿Nos jugamos un\ncaramelo a los dados?\nSi ganas, te doy dos.\n\nPulsa B para tirar.", c.rec); }
+    if(candy>0 && Math.random()<.6){ pendingB="dados"; return say("ESQUELETO", "¿Nos jugamos un\ncaramelo a los dados?\nSi ganas, te doy dos.\n\nPulsa A para tirar.", c.rec); }
     return say("ESQUELETO", SKELETON_LINES[Math.floor(Math.random()*SKELETON_LINES.length)], c.rec); }
 }
 const ZOMBIE_JOKES = [
@@ -2165,12 +2194,20 @@ const ZOMBIE_JOKES = [
   "Toc, toc.\n—¿Quién es?\n—Zombi.\n—¿Zombi quién?\n—Zombienvenido\na la fiesta.",
   "¿Por qué el esqueleto\nno baila?\n\nPorque no tiene\ncuerpo para eso."];
 const PREDICTIONS = ["Esta noche bailarás\nmás de lo que crees.","Alguien llevará tu\nmismo disfraz.","La última canción\nla pedirás tú.","Encontrarás algo\nque perdiste en 2019.","Mañana no recordarás\nla mitad. Y bien.","Te tocará hacer\nde DJ un rato."];
+/* La bruja del claro: por un caramelo te da una idea de disfraz (en la web salen de la base de datos y no se repiten) */
+const WITCH_IDEAS = ["TÍA GLADYS (Weapons).\nPeluca naranja cortita,\ncolorete rojo en dos\ncírculos y labios\npintados por fuera.\nCorre con los brazos\nhacia atrás. Nadie lo\nolvidará.", "LAS GEMELAS DE\nEL RESPLANDOR.\nDos vestidos azul cielo,\nlazo blanco, calcetines\naltos. Quietas, de la\nmano, sin parpadear.\nGanan siempre.", "JACK TORRANCE\nASOMADO.\nCamisa de pana, hacha\nde cartón y un marco\nde puerta roto hecho\ncon una caja. Saca\nla cabeza: «¡Aquí\nestá Johnny!».", "CARRIE EN EL BAILE.\nVestido de fiesta claro,\ncorona y un cubo de\nsangre falsa por\nencima. Barato, fácil\ny la foto es brutal.", "LA SUSTANCIA.\nChaqueta amarilla con\nhombreras y pendientes\ngrandes. En pareja:\nuna de Elisabeth y otra\nde Sue, con una jeringa\ngigante de juguete.", "GHOSTFACE CON\nVÍCTIMA.\nUno con túnica negra\ny máscara; el otro en\nalbornoz con el móvil\nen la oreja todo el\nrato. «¿Cuál es tu\npeli de miedo favorita?»", "M3GAN.\nVestido gris de cuello\nbebé, lazo al cuello,\npeluca castaña lisa\ny lentillas claras.\nEnsaya el baile: es\nlo que la hace ganar.", "ART THE CLOWN\n(Terrifier).\nMono blanco y negro,\ngorrito mini, cara\nblanca y boca negra.\nUna bolsa de basura\ncomo bolso. No hables\nen toda la noche.", "SAMARA (The Ring).\nCamisón blanco, pelo\nnegro largo delante de\nla cara y maquillaje\nmojado. Pide a alguien\nque vaya de tele de\ncartón.", "REGAN (El Exorcista).\nCamisón manchado,\nlentillas amarillas y\ngrietas en la piel con\nlápiz morado. Bonus:\npuré de guisantes.", "BEETLEJUICE Y LYDIA.\nTraje a rayas blanco y\nnegro con pelo verdoso;\nella, vestido de novia\nrojo con velo. Pareja\nque arrasa en fotos.", "CHUCKY Y TIFFANY.\nPeto vaquero y jersey\nde rayas con cicatrices;\nella, chupa de cuero,\nvestido de novia y\nmucho rímel corrido.", "FREDDY KRUEGER.\nJersey de rayas rojas\ny verdes, sombrero\nmarrón y un guante de\ncuchillas hecho con\npapel de aluminio.", "PEARL (Ti West).\nVestido rojo de granja\ncon lazo, coletas,\nsonrisa forzada que\nduele y un hacha. Que\nla sonrisa no se caiga.", "DANI DE MIDSOMMAR.\nVestido blanco bordado\ny una corona de flores\nENORME. Llorar es parte\ndel disfraz. Quien gana\nconcursos va de esto.", "NOSFERATU.\nGorro calvo, orejas\npuntiagudas, uñas\nlargas y abrigo negro.\nMuévete pegado a la\npared: tu sombra es\nmedio disfraz.", "ANNABELLE.\nVestido blanco con\nlazos, coletas con\nlazo rojo y cara de\nporcelana con grietas.\nMirada fija a la\ncámara en cada foto.", "PENNYWISE Y GEORGIE.\nUno de payaso con\ncuello de volantes; el\notro con chubasquero\namarillo y barco de\npapel. Globo rojo\nobligatorio.", "JASON VOORHEES.\nMáscara de hockey,\nchaqueta militar verde\ny machete de cartón.\nEl disfraz de última\nhora más digno.", "HANNIBAL Y CLARICE.\nMono azul, bozal de\nrejilla y una carretilla\nde mano dibujada; ella,\nchaqueta y placa del\nFBI. Elegante y raro.", "MICHAEL MYERS.\nMono azul mecánico,\nmáscara blanca y un\ncuchillo de cartón.\nNo corras nunca: anda.\nY quédate quieto al\nfondo de las fotos.", "LA FAMILIA ADDAMS\n(para grupo).\nMerlina, Morticia,\nGómez, el tío Lucas\ny Cosa (una mano en\nuna caja). Cada uno\nelige y salís juntos.", "BILLY (Saw).\nCara blanca con\nmofletes rojos en\nespiral, pajarita roja\ny traje negro. Graba\nmensajes en el móvil:\n«Quiero jugar...».", "LEATHERFACE.\nDelantal de carnicero,\ncamisa con corbata y\nuna máscara de cuero\nhecha con medias.\nMotosierra de cartón\nque ruja con la voz."];
+const witchRec = () => (critters.find(c=>c.kind==="bruja")||{}).rec;
+function talkWitch(){
+  if(candy<1) return say("BRUJA", "Sin caramelo no hay\nhechizo, cariño.\nVuelve con uno y te\ndiré de qué disfrazarte.", witchRec());
+  pendingB="bruja"; return say("BRUJA", "Por un caramelo te digo\nun disfraz que gana\nconcursos. De verdad.\n\nPulsa A para pagarle.", witchRec());
+}
 function gossip(){
   const yes=npcs.filter(n=>n.attend==="si"), no=npcs.filter(n=>!confirmed(n));
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   const opts=[];
   if(yes.length){ const a=pick(yes); opts.push(`Me han dicho que ${a.nick}\nviene seguro.`); const p=yes.filter(n=>n.party==="si"); if(p.length) opts.push(`${pick(p).nick} se queda\nhasta el final. Seguro.`); }
   if(no.length) opts.push(`${pick(no).nick} aún no ha dicho\nnada. Le guardo sitio...`);
+  opts.push("En el claro de detrás\ndel puente vive una\nbruja. Sabe mucho\nde disfraces...");
   if(crowStash>0) opts.push("A los cuervos les gusta\nlo que brilla. Y nunca\nolvidan dónde lo esconden.");
   opts.push(`Ya van ${yes.length + (me&&me.attend==="si"?1:0)} confirmados.\nVoy a tener que cavar más.`);
   return pick(opts);
@@ -2191,7 +2228,7 @@ function interact(){
   const t = tileAt(tx,ty);
   if(t==="T"||t==="C"){ const got=maybeCandy("tb"+tx+","+ty,.5); return say("LÁPIDA", tombText(tx,ty)+(got?"\n\n(Alguien dejó un\ncaramelo de ofrenda)":"")); }
   if(t==="P"){
-    if(!isLit(tx,ty)) return say("CALABAZA", "Zzz...\n(Está apagada. Pulsa B\npara encenderla.)");
+    if(!isLit(tx,ty)){ unlit.delete(tx+","+ty); return say("CALABAZA", "¡Fsss! La enciendes\ny abre los ojos.\n—Ya era hora."); }
     const k="pk"+tx+","+ty;
     if(maybeCandy(k,.75)) return say("CALABAZA", "¡Toma, un caramelo!\nNo se lo digas a nadie.");
     return say("CALABAZA", PUMPKIN_LINES[Math.floor(Math.random()*PUMPKIN_LINES.length)]);
@@ -2201,15 +2238,16 @@ function interact(){
   if(t==="K") return say("TUMBA DE LOS ANFITRIONES", "AQUÍ YACEN\nADRI E IRIS\n\nDescansarán en paz...\ncuando acabe la fiesta.");
   if(t==="S"){ if(candy<1) return say("ESPANTAPÁJAROS", "Juego al trile con los\nque pasan. Pero sin\ncaramelo no hay apuesta."); return openTrile(); }
   if(t==="H"){ const got=maybeCandy("hog",.35); if(got) return say("HOGUERA", "Entre las brasas hay\nun caramelo tostado.");
-    if(candy>0){ pendingB="hoguera"; return say("HOGUERA", "Huele a castañas.\nDicen que si echas un\ncaramelo, el fuego\ncambia de color...\n\nPulsa B para echarlo."); }
+    if(candy>0){ pendingB="hoguera"; return say("HOGUERA", "Huele a castañas.\nDicen que si echas un\ncaramelo, el fuego\ncambia de color...\n\nPulsa A para echarlo."); }
     return say("HOGUERA", "Huele a castañas\ny a humo. Qué gusto."); }
-  if(t==="b") return say("BANCO", (ty===14?"Alguien ha grabado:\n'A + I · 31·10'\n\n":"Un banco de piedra\npara descansar.\n\n")+"Pulsa B para sentarte.");
+  if(t==="b"){ const bn=benchAt(tx,ty); if(bn){ player.sit={cx:bn.x+23, top:bn.y, base:bn.base}; player.dir="down"; return true; } }
   if(t==="G") return say("FOSA", "Está recién cavada.\n¿Para quién será?");
   if(t==="W"||t==="w") return say("ESTANQUE", "El agua está quieta.\nDemasiado quieta.");
   if(t==="V"){
     if(candy<1) return say("POZO DE LOS DESEOS", "Necesitas un caramelo\npara pedir un deseo.");
-    pendingB="pozo"; return say("POZO DE LOS DESEOS", "¿Echas un caramelo\npara conocer tu futuro?\n\nPulsa B para echarlo.");
+    pendingB="pozo"; return say("POZO DE LOS DESEOS", "¿Echas un caramelo\npara conocer tu futuro?\n\nPulsa A para echarlo.");
   }
+  if(t==="U") return talkWitch();
   if(t==="Q"){ const ghosts=npcs.filter(n=>!confirmed(n)&&n.attend!=="no").map(n=>n.nick);
     return say("ESTANQUE DE LAS ÁNIMAS", ghosts.length ? "En el agua se reflejan\nlos que aún no han dicho\nque sí:\n\n"+ghosts.slice(0,8).join(", ")+(ghosts.length>8?"...":"") : "El agua está en calma.\nNo queda nadie por\ndecidirse. Qué bien."); }
   if(t==="Z") return say("MENHIR", ["Unas runas brillan y\nse apagan, como si\nrespiraran.","Pone algo en un idioma\nmuy antiguo. Parece\nuna lista de invitados.","La piedra está tibia.\nAlguien ha estado\nesperando aquí mucho\ntiempo."][Math.floor(Math.random()*3)]);
@@ -2223,7 +2261,8 @@ function interact(){
   if(t==="m") return say("SETAS","Mejor no comerlas.\nHazme caso.");
   if(t==="#") return say("TALUD","Rocas y raíces.\nMejor por la escalera.");
   if(t==="M"){ const got=maybeCandy("mau",1); return say("MAUSOLEO", got?"Por una rendija sale\nuna mano huesuda...\ny te da un caramelo.":"Está cerrado.\nAlgo se mueve dentro..."); }
-  if(t==="L"){ const got=isLit(tx,ty)&&maybeCandy("fl"+tx+","+ty,.5); return say("FAROL", got?"Junto a la llama hay\nun caramelo calentito.":isLit(tx,ty) ? "La llama tiembla\ncuando pasas." : "Está apagado.\nPulsa B para encenderlo."); }
+  if(t==="L"){ if(!isLit(tx,ty)){ unlit.delete(tx+","+ty); return say("FAROL","Enciendes el farol.\nLa llama tiembla\ncuando pasas."); }
+    const got=maybeCandy("fl"+tx+","+ty,.5); return say("FAROL", got?"Junto a la llama hay\nun caramelo calentito.":"La llama tiembla\ncuando pasas."); }
 }
 const sessionGot = new Map();
 
@@ -2328,7 +2367,8 @@ $("#board-y").onclick=async ()=>{
 
 /* ================= DIALOG ================= */
 let typer=null;
-function say(who, text, rec){
+let sayFull="";
+function say(who, text, rec){ sayFull=text;
   $("#dlg-who").textContent = who;
   const av=$("#dlg-av"); av.hidden=!rec; if(rec) drawIcon(av,rec);
   const el=$("#dlg-txt"); el.textContent=""; clearInterval(typer);
@@ -2404,7 +2444,7 @@ function buildTitle(){
 }
 /* Datos de la fiesta: cambiar aquí cuando estén cerrados */
 const FIESTA = {
-  cuando: "Sáb 31 oct · 22:30–23:00",
+  cuando: "Sáb 31 oct · a partir de las 22:30",
   donde: "Nuestra casa",
   despues: "Oversize · Child's Play (5º aniversario). Sala Galileo Galilei, C/ Galileo 100",
   entrada: "20–22 €",
