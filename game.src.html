@@ -3044,6 +3044,11 @@ function applyGuests(list){
   for(let i=npcs.length-1;i>=0;i--) if(!seen.has(npcs[i].id)) npcs.splice(i,1);
   updateCount();
 }
+/* Registro de uso: cada 30 s, mientras la app está abierta y a la vista, se apunta el tiempo y si está jugando */
+const SID = Math.random().toString(36).slice(2)+Date.now().toString(36);
+const DEVICE = /iPhone|iPad/.test(navigator.userAgent)?"iPhone":/Android/.test(navigator.userAgent)?"Android":"Ordenador";
+function ping(){ if(!LIVE || document.hidden) return; call("halloween_ping",{p_sid:SID, p_mode:mode, p_device:DEVICE}); }
+if(LIVE){ setInterval(ping, 30000); document.addEventListener("visibilitychange",()=>{ if(!document.hidden) ping(); }); }
 async function bootLive(){
   const w = await api("halloween_world",{p_token:TOKEN}).catch(()=>null);
   if(!w){ $("#t-btns").innerHTML=""; const p=document.createElement("p"); p.className="t-bad"; p.textContent="Este enlace no es válido. Pide a Adri o Iris tu invitación personal."; $("#t-btns").appendChild(p); $("#t-info").hidden=true; return false; }
@@ -3054,7 +3059,7 @@ async function bootLive(){
   draft = {...mine, attend:m.attend||""};
   notes = (w.notes||[]).map(noteFrom);
   applyGuests(w.guests||[]);
-  updateCandy(); setMode("title");
+  updateCandy(); setMode("title"); ping();
   if(!m.seenIntro) showIntro();
   setInterval(async()=>{ const r=await call("halloween_world"); if(r){ applyGuests(r.guests||[]); notes=(r.notes||[]).map(noteFrom); if(!$("#s-board").hidden && !$("#notes").hidden) renderNotes(); } }, 30000);
   return true;
