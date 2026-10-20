@@ -28,7 +28,9 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .chip.snd{font-size:12px;padding:9px 11px;color:#ffe08a}
 .chip.snd.off{color:#5a7a80;text-decoration:line-through}
 .hap{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
-.hud-l{display:grid;gap:8px;justify-items:start}
+.hud-l{display:grid;gap:12px;justify-items:stretch}
+.hud-l .chip,.hud-l .chip.menu{flex-direction:column;justify-content:center;gap:4px;width:66px;box-sizing:border-box;padding:8px 6px 7px;margin:0}
+.hud-l .chip small{font-size:5px}
 .chip{display:inline-flex;align-items:center;gap:7px;font:9px var(--px);color:#e8f4f0;background:#0b2e38;padding:7px 10px 7px 8px;
   border:0;box-shadow:0 0 0 3px #081820,inset 0 2px 0 #2a6f6e,inset 0 -3px 0 #06141a,4px 4px 0 3px rgba(0,0,0,.35)}
 .chip b{font-weight:400;font-size:11px;color:#ffe08a;font-variant-numeric:tabular-nums}
@@ -324,8 +326,8 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 
   <div class="hud" id="hud" hidden>
     <div class="hud-l">
-      <button class="chip menu" id="btn-guests" type="button" aria-label="Ver lista de invitados"><svg class="ico" viewBox="0 0 9 10" aria-hidden="true" shape-rendering="crispEdges"><path fill="#081820" d="M2 0h5v1h1v1h1v8H8V9H7v1H6V9H3v1H2V9H1v1H0V2h1V1h1z"/><path fill="#e8f4f0" d="M2 1h5v1h1v7H7V8H6v1H3V8H2v1H1V2h1z"/><path fill="#081820" d="M3 3h1v2H3zM5 3h1v2H5z"/></svg><b id="count">0</b><small>VIENEN</small></button>
       <span class="chip" id="candy-chip"><svg class="ico" viewBox="0 0 12 8" aria-hidden="true" shape-rendering="crispEdges"><path fill="#081820" d="M0 1h2v1h1v1h1V2h4v1h1V2h1V1h2v6h-2V6H9V5H8v1H4V5H3v1H2v1H0z"/><path fill="#ff7ab0" d="M1 2h1v1h1v2H2v1H1z M10 2h1v4h-1V5H9V3h1z"/><path fill="#ff9a3c" d="M4 3h4v2H4z"/><path fill="#ffe08a" d="M4 3h2v1H4z"/></svg><b id="candy">0</b><small>CARAMELOS</small></span>
+      <button class="chip menu" id="btn-guests" type="button" aria-label="Ver lista de invitados"><svg class="ico" viewBox="0 0 9 10" aria-hidden="true" shape-rendering="crispEdges"><path fill="#081820" d="M2 0h5v1h1v1h1v8H8V9H7v1H6V9H3v1H2V9H1v1H0V2h1V1h1z"/><path fill="#e8f4f0" d="M2 1h5v1h1v7H7V8H6v1H3V8H2v1H1V2h1z"/><path fill="#081820" d="M3 3h1v2H3zM5 3h1v2H5z"/></svg><b id="count">0</b><small>VIENEN</small></button>
     </div>
     <div class="hud-r"><button class="chip menu snd" id="btn-snd" type="button" aria-label="Música">♪</button>
     <button class="chip menu" id="btn-menu" type="button" aria-label="Volver al menú"><span class="burger" aria-hidden="true"><i></i><i></i><i></i></span>MENÚ</button></div>
