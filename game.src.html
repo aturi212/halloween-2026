@@ -174,6 +174,26 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
 .tr-msg{margin:0;font-size:8px;line-height:1.9;color:#f3ead8;min-height:3.8em;white-space:pre-line}
 #tr-candy{font-size:8px;color:#ffe08a}
 
+/* Mensajes */
+#s-msgs{justify-content:center;z-index:30;background:rgba(11,8,22,.96)}
+.msgs{flex:0 1 auto;min-height:60dvh;background-color:#241a3e;gap:10px}
+.ms-list{display:grid;gap:8px}
+.ms-item{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;text-align:left;background:var(--paper);color:var(--ink);border:3px solid var(--ink);padding:6px 10px;cursor:pointer;font:8px var(--px);line-height:1.6}
+.ms-item canvas{width:32px;height:57px;image-rendering:pixelated;margin:-14px 0 -12px}
+.ms-item b{display:block;font-weight:400;font-size:9px}
+.ms-item small{display:block;color:#6a5f88;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-dot{min-width:20px;height:20px;border-radius:10px;background:#ff3b4a;color:#fff;font-size:8px;display:grid;place-items:center;padding:0 5px}
+.ms-empty{margin:0;font-size:8px;line-height:1.9;color:#e8dcff}
+.ms-thread{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
+.ms-log{flex:1;min-height:180px;max-height:46dvh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:6px 2px}
+.ms-b{max-width:80%;padding:8px 10px;font:8px/1.8 var(--px);background:var(--paper);color:var(--ink);box-shadow:3px 3px 0 rgba(0,0,0,.35);overflow-wrap:anywhere;white-space:pre-wrap}
+.ms-b.me{align-self:flex-end;background:var(--candle)}
+.ms-b small{display:block;font-size:6px;opacity:.6;margin-top:3px}
+.ms-form{display:flex;gap:8px}
+.ms-form input{flex:1;min-width:0;font:10px var(--px);padding:10px;border:3px solid var(--ink);background:#fff;color:var(--ink)}
+.notif{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:#ff3b4a;color:#fff;font:8px var(--px);display:grid;place-items:center;padding:0 4px;box-shadow:0 0 0 2px #081820}
+.tbtn,.chip.menu{position:relative}
+
 /* Almas en pena */
 #s-almas{justify-content:center}
 .almas{flex:0 0 auto;background-color:#1e1430;gap:10px}
@@ -356,6 +376,19 @@ canvas#game{position:absolute;inset:0;width:100%;height:100%;display:block;touch
       <button class="pxbtn alt" id="tr-play" type="button">JUGAR · 1 CARAMELO</button>
     </div>
     <div class="board-btns"><button class="pxbtn" id="tr-b" type="button"><b class="key">B</b> CERRAR</button></div>
+  </div>
+
+  <!-- Mensajes privados -->
+  <div class="screen bscreen" id="s-msgs" hidden role="dialog" aria-labelledby="ms-h">
+    <div class="board msgs">
+      <div class="board-head"><h2 id="ms-h">MENSAJES</h2><span id="ms-sub"></span></div>
+      <div class="ms-list" id="ms-list"></div>
+      <div class="ms-thread" id="ms-thread" hidden>
+        <div class="ms-log" id="ms-log" aria-live="polite"></div>
+        <form class="ms-form" id="ms-form"><input id="ms-in" maxlength="400" autocomplete="off" placeholder="Escribe un mensaje..." aria-label="Mensaje"><button class="pxbtn alt" type="submit">ENVIAR</button></form>
+      </div>
+    </div>
+    <div class="board-btns"><button class="pxbtn" id="ms-b" type="button"><b class="key">B</b> CERRAR</button></div>
   </div>
 
   <!-- Minijuego: Almas en pena -->
@@ -2090,7 +2123,7 @@ function update(now){
   if(mode==="play"){ const ic=inClaro(player.x,player.y); if(ic&&!inClaroNow) areaBanner(); inClaroNow=ic; }
   updatePet(now);
   if(now>(update.vt||0)){ update.vt=now+250; const d=Math.hypot(player.fx-GRAMO.x, player.fy-GRAMO.y); MUSIC.setVol(mode==="play" ? .45*(.35+.65*Math.max(0,1-d/14)) : .3); }
-  if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-almas").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
+  if(mode==="play" && $("#dialog").hidden && $("#s-board").hidden && $("#s-gramola").hidden && $("#s-trile").hidden && $("#s-almas").hidden && $("#s-msgs").hidden && $("#s-prof").hidden && $("#s-guests").hidden && !lookAt){
     advance(player, now, player.from&&player.from[1]===31&&player.y===28?900:runHeld?95:170);
     if(LIVE && !player.moving && (player.x!==lastPos.x || player.y!==lastPos.y)){
       lastPos={x:player.x,y:player.y}; clearTimeout(moveTimer);
@@ -2210,6 +2243,7 @@ addEventListener("keydown",e=>{
   if(e.target.closest && e.target.closest("input,textarea,[contenteditable]")) return;
   if(KEYS[e.key] && mode==="play"){ keyDir=KEYS[e.key]; syncHeld(); e.preventDefault(); }
   if(!$("#s-trile").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeTrile(); return; }
+  if(!$("#s-msgs").hidden){ if(e.key==="Escape") msgsBack(); return; }
   if(!$("#s-almas").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeAlmas(); else almasKey(e); return; }
   if(!$("#s-gramola").hidden){ if(e.key==="Escape"||e.key==="b"||e.key==="k") closeGramola(); return; }
   if(!$("#s-board").hidden){ if(e.key==="Escape"||e.key==="b") boardBack(); if(e.key==="y"&&$("#note-new").hidden) newNote(); return; }
@@ -2221,6 +2255,7 @@ addEventListener("keyup",e=>{ if(KEYS[e.key]===keyDir){ keyDir=null; syncHeld();
 /* Mandos estilo Game Boy: A = hablar / usar / confirmar (y saltar si no hay nada delante).
    B = correr mientras se mantiene, y en los textos pasar rápido o cerrar (y decir que no). */
 function doPending(pb){
+  if(pb && pb.msg){ openThread(pb.msg.id, pb.msg.nick, pb.msg); return; }
   if(pb && candy>0){
     if(pb==="bruja"){
       if(LIVE){ call("halloween_witch").then(r=>{ if(!r||!r.ok){ say("BRUJA","El caldero no responde.\nPrueba otra vez.",witchRec()); return; } setCandy(r.candy,false); say("BRUJA",r.idea,witchRec()); });
@@ -2473,6 +2508,60 @@ async function pickTrile(h){
 }
 $("#tr-play").onclick=playTrile; $("#tr-b").onclick=closeTrile;
 
+/* ================= MENSAJES PRIVADOS =================
+   Al hablar con un invitado, A le escribe. En la portada, el botón MENSAJES (con puntito rojo si hay sin leer)
+   abre la lista de chats; cada chat es una conversación con una persona. */
+let unread=0, msThread=null, msPoll=0;
+const DEMO_MSGS={"e1":[{mine:false,text:"¡Eyy! ¿De qué te vas a disfrazar? Yo dudo entre bruja y Morticia 🖤",at:new Date().toISOString()}]};
+if(!LIVE) unread=1;
+function msgBtn(){ const b=tbtn("✉","MENSAJES","",false,openInbox); b.id="t-msgs"; paintUnread(b); return b; }
+function paintUnread(b){ for(const el of [b||$("#t-msgs"), $("#btn-menu")]){ if(!el) continue; let d=el.querySelector(".notif"); if(unread>0){ if(!d){ d=document.createElement("span"); d.className="notif"; el.appendChild(d); } d.textContent=unread>9?"9+":unread; } else if(d) d.remove(); } }
+async function refreshUnread(){ if(!LIVE) return paintUnread(); const n=await call("halloween_msg_unread"); if(typeof n==="number"){ unread=n; paintUnread(); } }
+if(LIVE) setInterval(refreshUnread, 30000);
+const whoById = id => npcs.find(n=>n.id===id);
+async function openInbox(){
+  closeDialog(); msThread=null; clearInterval(msPoll);
+  $("#s-msgs").hidden=false; $("#ms-thread").hidden=true; $("#ms-list").hidden=false; $("#ms-h").textContent="MENSAJES"; $("#ms-b").lastChild.textContent=" CERRAR";
+  const box=$("#ms-list"); box.innerHTML='<p class="ms-empty">Cargando...</p>';
+  let list = LIVE ? (await call("halloween_msg_inbox")||[]) : Object.entries(DEMO_MSGS).map(([id,ms])=>{ const n=whoById(id)||{}; const l=ms[ms.length-1]; return {id,nick:n.nick,avatar:n.avatar,last:l&&l.text,last_mine:l&&l.mine,unread:ms.filter(m=>!m.mine&&!m.read).length}; });
+  box.innerHTML="";
+  $("#ms-sub").textContent = list.length ? `${list.length} CHAT${list.length>1?"S":""}` : "";
+  if(!list.length){ box.innerHTML='<p class="ms-empty">Aún no tienes mensajes.<br><br>Para escribir a alguien, acércate a su personaje en el cementerio, pulsa A y luego A otra vez.</p>'; return; }
+  for(const c of list){
+    const b=document.createElement("button"); b.type="button"; b.className="ms-item";
+    const cv=document.createElement("canvas"); const n=whoById(c.id); drawIcon(cv, n ? look(n) : {char:"fantasma",ghost:true});
+    const t=document.createElement("span"); const nb=document.createElement("b"); nb.textContent=(c.nick||"?").toUpperCase(); const sm=document.createElement("small"); sm.textContent=(c.last_mine?"Tú: ":"")+(c.last||""); t.append(nb,sm);
+    b.append(cv,t); if(c.unread>0){ const d=document.createElement("span"); d.className="ms-dot"; d.textContent=c.unread; b.appendChild(d); }
+    b.onclick=()=>openThread(c.id, c.nick, n); box.appendChild(b);
+  }
+}
+async function openThread(id, nick, rec){
+  closeDialog(); $("#s-msgs").hidden=false; $("#ms-list").hidden=true; $("#ms-thread").hidden=false;
+  $("#ms-h").textContent=(nick||"?").toUpperCase(); $("#ms-sub").textContent=""; $("#ms-b").lastChild.textContent=" VOLVER";
+  msThread={id,nick}; await loadThread(true); clearInterval(msPoll); msPoll=setInterval(()=>loadThread(false), 8000);
+  setTimeout(()=>$("#ms-in").focus(),50);
+}
+async function loadThread(scroll){
+  if(!msThread) return; const id=msThread.id;
+  const ms = LIVE ? (await call("halloween_msg_thread",{p_with:id})||[]) : (DEMO_MSGS[id]=(DEMO_MSGS[id]||[]).map(m=>({...m,read:true})));
+  if(!msThread||msThread.id!==id) return;
+  const log=$("#ms-log"), atBottom=log.scrollHeight-log.scrollTop-log.clientHeight<40; log.innerHTML="";
+  if(!ms.length){ const p=document.createElement("p"); p.className="ms-empty"; p.textContent=`Escríbele algo a ${msThread.nick}.`; log.appendChild(p); }
+  for(const m of ms){ const d=document.createElement("div"); d.className="ms-b"+(m.mine?" me":""); d.textContent=m.text; const sm=document.createElement("small");
+    sm.textContent=new Date(m.at).toLocaleString("es-ES",{weekday:"short",hour:"2-digit",minute:"2-digit"}); d.appendChild(sm); log.appendChild(d); }
+  if(scroll||atBottom) log.scrollTop=log.scrollHeight;
+  if(!LIVE){ unread=0; paintUnread(); } else refreshUnread();
+}
+$("#ms-form").addEventListener("submit", async e=>{
+  e.preventDefault(); const inp=$("#ms-in"), text=inp.value.trim(); if(!text||!msThread) return;
+  inp.value="";
+  if(LIVE){ const r=await call("halloween_msg_send",{p_to:msThread.id, p_text:text}); if(!r){ inp.value=text; return; } }
+  else (DEMO_MSGS[msThread.id]=DEMO_MSGS[msThread.id]||[]).push({mine:true,text,at:new Date().toISOString(),read:true});
+  haptic(10); loadThread(true);
+});
+function msgsBack(){ if(!$("#ms-thread").hidden) return openInbox(); $("#s-msgs").hidden=true; msThread=null; clearInterval(msPoll); if(mode==="title") buildTitle(); }
+$("#ms-b").onclick=msgsBack;
+
 /* ================= ALMAS EN PENA =================
    Minijuego de burbujas: apunta, suelta y junta 3 almas del mismo color para liberarlas.
    Premio: 1 caramelo cada 15 almas liberadas (máx. 3 por partida) y 2 extra si limpias el tablero. */
@@ -2635,14 +2724,17 @@ function closeDialog(){ clearInterval(typer); $("#dialog").hidden=true; pendingB
 $("#dialog").addEventListener("click",closeDialog);
 function showGuest(c){
   if(!confirmed(c)){
-    return say((c.isMe?"TÚ":(c.nick||"?").toUpperCase()) + (c.demo?" (ejemplo)":""),
-      c.attend==="quiza" ? (c.isMe ? "Has dicho QUIZÁ, así que\nsigues de fantasma.\nDi que SÍ para tener\ntu personaje." : "Dice que quizá viene.\nHasta que diga que sí,\nsigue de fantasma...")
-      : c.isMe ? "Aún eres un fantasma.\nConfirma para tener\ntu personaje." : "Todavía no ha respondido.\nSigue vagando como\nfantasma...", look(c));
+    say((c.isMe?"TÚ":(c.nick||"?").toUpperCase()) + (c.demo?" (ejemplo)":""),
+      (c.attend==="quiza" ? (c.isMe ? "Has dicho QUIZÁ, así que\nsigues de fantasma.\nDi que SÍ para tener\ntu personaje." : "Dice que quizá viene.\nHasta que diga que sí,\nsigue de fantasma...")
+      : c.isMe ? "Aún eres un fantasma.\nConfirma para tener\ntu personaje." : "Todavía no ha respondido.\nSigue vagando como\nfantasma...")+(canWrite(c)?"\n\n(Pulsa A para escribirle)":""), look(c));
+    if(canWrite(c)) pendingB={msg:c}; return;
   }
   const lines = [TXT.attend[c.attend], c.party?TXT.party[c.party]:""].filter(Boolean);
   if(allIn(c)) lines.push(c.petName ? `Le acompaña ${c.petName}.` : "Le sigue una mascota.");
-  say((c.isMe?"TÚ · ":"") + (c.nick||"?").toUpperCase() + (c.demo?" (ejemplo)":""), lines.join("\n"), c);
+  say((c.isMe?"TÚ · ":"") + (c.nick||"?").toUpperCase() + (c.demo?" (ejemplo)":""), lines.join("\n")+(canWrite(c)?"\n\n(Pulsa A para escribirle)":""), c);
+  if(canWrite(c)) pendingB={msg:c};
 }
+const canWrite = c => !c.isMe && !!c.id;
 function cast(){
   const a = npcs.filter(n=>n.attend!=="no");
   if(mode==="play") a.push({...(me||{nick:"TÚ"}), ...player, isMe:true});
@@ -2686,10 +2778,10 @@ function arrive(now){
 function buildTitle(){
   const box=$("#t-btns"); box.innerHTML="";
   if(confirmed(me)){
-    box.append(tbtn("▶","ENTRAR AL CEMENTERIO","",true,enter), tbtn("✎","MI PERSONAJE","",false,openProfile));
+    box.append(tbtn("▶","ENTRAR AL CEMENTERIO","",true,enter), tbtn("✎","MI PERSONAJE","",false,openProfile), msgBtn());
   } else {
     const no = me && me.attend==="no";
-    box.append(tbtn("✦", no?"¡AL FINAL VOY!":"CONFIRMAR ASISTENCIA","",true,openProfile), tbtn("▶","ENTRAR AL CEMENTERIO","",false,enter));
+    box.append(tbtn("✦", no?"¡AL FINAL VOY!":"CONFIRMAR ASISTENCIA","",true,openProfile), tbtn("▶","ENTRAR AL CEMENTERIO","",false,enter), msgBtn());
     if(!no){
       const l=document.createElement("button"); l.type="button"; l.className="t-link"; l.textContent="No puedo ir";
       l.onclick=()=>{ me={...draft,attend:"no"}; save(); buildTitle(); };
@@ -3059,7 +3151,7 @@ async function bootLive(){
   draft = {...mine, attend:m.attend||""};
   notes = (w.notes||[]).map(noteFrom);
   applyGuests(w.guests||[]);
-  updateCandy(); setMode("title"); ping();
+  updateCandy(); setMode("title"); ping(); refreshUnread();
   if(!m.seenIntro) showIntro();
   setInterval(async()=>{ const r=await call("halloween_world"); if(r){ applyGuests(r.guests||[]); notes=(r.notes||[]).map(noteFrom); if(!$("#s-board").hidden && !$("#notes").hidden) renderNotes(); } }, 30000);
   return true;
