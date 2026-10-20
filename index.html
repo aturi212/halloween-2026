@@ -1437,7 +1437,7 @@ const DEMO = [
   {id:"e4",nick:"Marina",avatar:"marina",attend:"quiza",party:"si",x:16,y:16},
   {id:"e5",nick:"Fran",avatar:"fran",attend:"si",party:"si",bizum:"hecho",hatStyle:1,faceStyle:0,handStyle:0,petStyle:4,x:12,y:13},
   {id:"e6",nick:"María",avatar:"maria",attend:"si",party:"si",bizum:"no",hatStyle:2,x:17,y:13},
-  {id:"e7",nick:"Edu",x:16,y:8},{id:"e8",nick:"Nava",x:20,y:7},{id:"e9",nick:"Dani",x:7,y:12},{id:"e10",nick:"Bea",x:21,y:15},
+  {id:"e7",nick:"Edu",x:16,y:8},{id:"e8",nick:"Nava",x:20,y:7},{id:"e9",nick:"Dani",x:7,y:12},{id:"e10",nick:"Bea",x:21,y:15},{id:"e11",nick:"Rober",avatar:"rober",attend:"no",x:0,y:0},{id:"e12",nick:"Óscar",avatar:"oscar",attend:"no",x:0,y:0},
 ];
 /* En la versión real el nombre llega con el enlace personal de cada invitado */
 let INVITE_NAME = "Adri";
@@ -1452,11 +1452,12 @@ const SC = window.HW_SCENE, GEN = window.HW_GEN, LOOKS = window.HW_LOOKS || {};
    Zona nueva al este, cruzando el puente por un hueco del seto. Ahí esperan los fantasmas (los que aún no han dicho que sí).
    El suelo ya viene pintado en suelo.png (columnas 32-47); aquí se amplían el mapa y la rejilla de paso. */
 const CLARO = {
-  map:["FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFF..Z.ZFFFFF", "FFFFF.Z....ZFFFF", "FFFF.........FFF", "FF######EE#####F", "FFF...........FF", "FFF...........FF", "===...QQ.......F", "FFF..QQQQQ....FF", "FFF.QQQQQDDD..FF", "FFF.QQQQQQQ...FF", "FFFFQQQQQQ...FFF", "FFFFF.......FFFF", "FFFFFF.....FFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF"],
-  walk:["0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000001101000000", "0000010111100000", "0000111111111000", "0000000011000000", "0001111111111100", "0001111111111100", "1111110011111110", "0001100000111100", "0001000001111100", "0001000000011100", "0000000000111000", "0000011111110000", "0000001111100000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000"],
-  stones:[[38, 7], [40, 6], [42, 6], [43, 7]],
-  mush:[[39.89, 10.73], [42.85, 11.83], [37.13, 7.05], [40.43, 18.43], [39.39, 6.73], [37.48, 8.44], [41.54, 7.2], [41.32, 18.03], [35.23, 13.06], [41.69, 18.92], [42.88, 18.81], [42.49, 13.76]],
-  spots:[[41, 8], [41, 11], [45, 12], [41, 6], [42, 7], [43, 12], [44, 8], [39, 8], [37, 11], [44, 11], [37, 8], [41, 17], [36, 12], [40, 8], [39, 10], [44, 16], [42, 17], [45, 11], [36, 11], [41, 12], [38, 17], [43, 13], [36, 13], [40, 12], [39, 17], [40, 17], [42, 18], [35, 15], [43, 17], [44, 10], [44, 12], [38, 8], [41, 18], [36, 8], [42, 12], [35, 13], [41, 10], [39, 11], [43, 10], [43, 15]],
+  map:["FFFFFFFFFFFFFFFF", "FFFFFF.....FFFFF", "FFFF.........FFF", "FFF.Z.......Z.FF", "FF.............F", "FF.............F", "FF.............F", "FFFZ.........ZFF", "FFFF.........FFF", "FF######EE#####F", "FFF...........FF", "FFF...........FF", "===...QQ.......F", "FFF..QQQQQ....FF", "FFF.QQQQQDDD..FF", "FFF.QQQQQQQ...FF", "FFFFQQQQQQ...FFF", "FFFFF.......FFFF", "FFFFFF.....FFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF", "FFFFFFFFFFFFFFFF"],
+  walk:["0000000000000000", "0000001111100000", "0000111111111000", "0001011111110100", "0011111111111110", "0011111111111110", "0011111111111110", "0000111111111000", "0000111111111000", "0000000011000000", "0001111111111100", "0001111111111100", "1111110011111110", "0001100000111100", "0001000001111100", "0001000000011100", "0000000000111000", "0000011111110000", "0000001111100000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000", "0000000000000000"],
+  stones:[[36, 3], [44, 3], [35, 7], [45, 7]],
+  tombs:[[37, 4], [39, 4], [42, 4], [44, 5], [37, 6], [39, 6], [42, 6], [38, 2], [41, 2], [43, 2]],
+  mush:[[39.89, 10.73], [42.85, 11.83], [40.43, 18.43], [41.32, 18.03], [35.23, 13.06], [41.69, 18.92], [42.88, 18.81], [42.49, 13.76], [35.6, 5.2], [45.3, 4.9], [38.3, 8.1], [43.4, 8.2], [40.7, 1.4], [36.4, 1.9]],
+  spots:[[35, 10], [36, 10], [37, 10], [38, 10], [39, 10], [40, 10], [41, 10], [42, 10], [43, 10], [44, 10], [45, 10], [35, 11], [36, 11], [37, 11], [38, 11], [39, 11], [40, 11], [41, 11], [42, 11], [43, 11], [44, 11], [45, 11], [36, 12], [37, 12], [40, 12], [41, 12], [42, 12], [43, 12], [44, 12], [45, 12], [46, 12], [35, 13], [36, 13], [42, 13], [43, 13], [35, 14], [35, 15], [43, 15], [42, 16], [43, 16], [44, 16], [37, 17], [38, 17], [39, 17], [40, 17], [41, 17], [42, 17], [43, 17], [38, 18], [39, 18], [40, 18], [41, 18], [42, 18]],
   frogs:[{"x": 41.72, "y": 15.98, "pad": 1}, {"x": 38.34, "y": 15.09, "pad": 1}, {"x": 40.84, "y": 15.86, "pad": 1}, {"x": 42.11, "y": 14.76, "pad": 1}, {"x": 42.5, "y": 16.6, "pad": 0, "tx": 42, "ty": 16}, {"x": 37.5, "y": 17.6, "pad": 0, "tx": 37, "ty": 17}],
   sparkles:[[1241, 475], [1268, 503], [1245, 538], [1223, 485], [1299, 427], [1195, 528], [1250, 470], [1311, 458], [1239, 492], [1227, 449], [1255, 441], [1292, 472], [1263, 461], [1221, 460], [1235, 479], [1283, 469], [1290, 493], [1248, 485], [1256, 464], [1261, 460], [1271, 447], [1249, 526], [1297, 508], [1262, 476], [1270, 498], [1262, 461], [1281, 418], [1308, 505], [1287, 509], [1251, 481], [1173, 459], [1301, 508], [1258, 480], [1233, 497], [1318, 462], [1248, 473], [1255, 529], [1201, 494], [1339, 471], [1259, 481], [1280, 460], [1257, 479], [1265, 467], [1246, 474], [1273, 478], [1318, 470], [1308, 456], [1346, 450], [1245, 525], [1185, 455], [1269, 505], [1285, 443], [1175, 493], [1235, 492], [1269, 490], [1249, 498], [1257, 491], [1225, 453], [1275, 501], [1256, 470]],
   cx:40.5, cy:12.5, rx:6, ry:6.6, lx:39.4, ly:14.9,
@@ -1489,9 +1490,9 @@ const tileAt = (x,y) => OBJ[x+","+y] || (MAP[y]&&MAP[y][x]);
 const GATE = {x0:14*32-12, x1:16*32+12, base:29*32+30};
 const GATE_T = new Set(["14,29","15,29","14,30","15,30"]);
 let gateOpenUntil = 0;
-const solidAt = (x,y) => GATE_T.has(x+","+y) || x<0||y<0||x>=W||y>=H||(SC.walk[y][x]!=="1"&&MAP[y][x]!=="m")||!!OBJ[x+","+y];
+const solidAt = (x,y) => GATE_T.has(x+","+y) || x<0||y<0||x>=W||y>=H||(SC.walk[y][x]!=="1"&&MAP[y][x]!=="m")||!!OBJ[x+","+y]||tombBlock(x,y);
 const IMG = {};
-["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png?v=20261020d"; });
+["suelo","objetos","fuego"].forEach(k=>{ const i=new Image(); i.onload=()=>{ IMG[k]=i; }; i.src="assets/"+k+".png?v=20261020e"; });
 /* Solo el SÍ da personaje: los de QUIZÁ siguen de fantasma */
 const confirmed = r => !!r && r.attend==="si";
 const look = r => confirmed(r) ? r : {...r, char:"fantasma", color:"#cfc8e6", party:"", costume:"", ghost:true};
@@ -2032,7 +2033,11 @@ function render(now){
     L.push({b:Y+camY+3, d:()=>{ g.fillStyle="rgba(6,6,14,.42)"; g.beginPath(); g.ellipse(X, Y-1, ghost?8:9, ghost?2:3, 0, 0, 7); g.fill();
       g.globalAlpha = ghost ? .8 : c.attend==="quiza" ? .82 : 1; g.drawImage(spr, X-16, Y-spr.height+1-bob); g.globalAlpha=1; }});
   }
-  for(const c of chars){ if(c.critter || !allIn(c) || (c.isMe && player.sit && PET_KIND[petOf(c)]!=="orbita")) continue; pushPet(L, g, c, camX, camY, now); }
+  if(camX+VW > 33*TS) for(const t of tombList()){
+    const X=t.x*TS+16-camX, Y=t.y*TS+30-camY; if(X<-40||X>VW+40||Y<-40||Y>VH+40) continue;
+    L.push({b:t.y*TS+30, d:()=>g.drawImage(TOMB_SPR, X-11, Y-27)});
+    chars.push({nick:t.n.nick, _x:X, _tag:Y-32, tomb:true}); }
+  for(const c of chars){ if(c.critter || c.tomb || !allIn(c) || (c.isMe && player.sit && PET_KIND[petOf(c)]!=="orbita")) continue; pushPet(L, g, c, camX, camY, now); }
   L.push({b:GATE.base, d:()=>drawGateW(g, camX, camY, now)});
   L.push({b:GRAMO.y*TS+30, d:()=>drawGramo(g, camX, camY, now)});
   L.push({b:MAQUINA.y*TS+30, d:()=>drawMaquina(g, camX, camY, now)});
@@ -2441,6 +2446,7 @@ const TREE_LINES = ["Sus ramas crujen\ncon el viento.", "Un búho te mira\ndesde
 const MUSH_LINES = ["Mejor no comerlas.\nHazme caso.", "Brillan un poquito.\nEso nunca es buena\nseñal.", "Huelen a fiesta\nde las de antes.", "Una seta te guiña\nun ojo. ¿O no?"];
 const TALUD_LINES = ["Rocas y raíces.\nMejor por la escalera.", "Escalar está muy bien.\nEsta noche, no.", "Entre las piedras\nasoma una mano.\nTe saluda."];
 const LAKE_LINES = ["El agua está quieta.\nDemasiado quieta.", "Algo ha hecho 'blub'.\nNo quieras saber qué.", "Tu reflejo va\ndisfrazado. Tú no.\nTodavía.", "Un nenúfar se mueve\nsolo. Normal."];
+const TOMB_NO = ["No puede venir.\nLe echaremos de menos.", "Aquí descansa alguien\nque se pierde la fiesta.\nQue en paz descanse.", "Dijo que no.\nSu espíritu sí vendrá.", "R.I.P.\nRechazó Invitación\nPersonal."];
 const FUENTE_LINES = ["El agua susurra nombres\nque no conoces.", "Alguien ha tirado\nuna moneda. Y una\ndentadura.", "El agua sabe a hierro.\nNo la bebas.", "Si escuchas bien,\nla fuente tararea."];
 const FAROL_LINES = ["La llama tiembla\ncuando pasas.", "Una polilla da vueltas.\nLleva así desde 1950.", "Da una luz preciosa.\nPara un susto."];
 const HOG_LINES = ["Huele a castañas\ny a humo. Qué gusto.", "El fuego crepita\ncomo si se riera.", "Alguien ha quemado\nun disfraz aquí.\nEra feo."];
@@ -2471,6 +2477,8 @@ function interact(){
   const [dx,dy]=D[player.dir], tx=player.x+dx, ty=player.y+dy;
   if(nearWisp()) return catchWisp();
   const cr = critters.find(c=>c.x===tx&&c.y===ty); if(cr) return talkCritter(cr);
+  const tb = tombList().find(t=>t.x===tx&&t.y===ty);
+  if(tb){ const c=tb.n; say("TUMBA DE "+(c.nick||"?").toUpperCase(), (c.isMe?"Aquí yaces tú.\nDijiste que no venías...\n\nSi cambias de idea,\nconfirma en MI PERSONAJE.":pick(TOMB_NO))+(canWrite(c)?"\n\n(Pulsa A para escribirle)":""), null); if(canWrite(c)) pendingB={msg:c}; return; }
   const n = npcs.find(n=>n.x===tx&&n.y===ty&&n.attend!=="no");
   if(n){ n.dir = {up:"down",down:"up",left:"right",right:"left"}[player.dir]; return showGuest(n); }
   const t = tileAt(tx,ty);
@@ -2825,6 +2833,24 @@ function showGuest(c){
   if(canWrite(c)) pendingB={msg:c};
 }
 const canWrite = c => !c.isMe && !!c.id;
+/* Los que han dicho que NO vienen tienen su tumba fija en la terraza del pantano, entre los menhires.
+   Los que aún no han contestado siguen de fantasmas. Si alguien cambia a SÍ, la tumba desaparece. */
+function tombList(){
+  const a=npcs.filter(n=>n.attend==="no");
+  if(me && me.attend==="no") a.push({...me, isMe:true});
+  a.sort((p,q)=>(p.nick||"").localeCompare(q.nick||""));
+  return a.slice(0,CLARO.tombs.length).map((n,i)=>({n, x:CLARO.tombs[i][0], y:CLARO.tombs[i][1]}));
+}
+function tombBlock(x,y){ if(x<36||y>8) return false; return tombList().some(t=>t.x===x&&t.y===y); }
+const TOMB_SPR=(()=>{ const c=document.createElement("canvas"); c.width=22; c.height=28; const g=c.getContext("2d");
+  const R=(x,y,w,h,col)=>{ g.fillStyle=col; g.fillRect(x,y,w,h); };
+  R(1,23,20,5,"#120e18"); R(2,23,18,4,"#3a2a26"); R(3,23,6,1,"#4e3a30"); R(13,25,5,1,"#2a1e1c");
+  R(5,4,12,20,"#120e18"); R(4,6,14,18,"#120e18"); R(6,3,10,2,"#120e18");
+  R(6,5,10,19,"#5e5a80"); R(5,7,12,17,"#5e5a80"); R(7,4,8,2,"#5e5a80");
+  R(6,6,2,17,"#7f7ba4"); R(7,4,3,2,"#7f7ba4"); R(15,7,2,17,"#433f60");
+  R(10,8,2,9,"#2e2a46"); R(8,10,6,2,"#2e2a46"); R(10,8,1,9,"#3b3858");
+  R(7,19,8,1,"#433f60"); R(3,21,2,2,"#6a3a8c"); R(4,20,1,1,"#b07ad8"); R(17,21,2,2,"#2e5a3a"); R(18,20,1,1,"#5ea06a");
+  return c; })();
 function cast(){
   const a = npcs.filter(n=>n.attend!=="no");
   if(mode==="play") a.push({...(me||{nick:"TÚ"}), ...player, isMe:true});
