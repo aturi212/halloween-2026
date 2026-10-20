@@ -1430,8 +1430,8 @@ for(const sp of SC.sprites){ if(sp.w<40) continue; const ty=Math.floor((sp.base-
   let letter=null; for(let x=x0;x<=x1;x++){ const l=MAP[ty]&&MAP[ty][x]; if(l&&!".,=EB #F".includes(l)){ letter=l; break; } }
   for(let x=x0;x<=x1;x++){ const l=MAP[ty]&&MAP[ty][x]; if(l && !"=EB".includes(l) && SC.walk[ty][x]==="1" && !(MAP[ty+1]&&MAP[ty+1][x]==="E")) OBJ[x+","+ty]=letter||"o"; } }
 /* Gramola: al lado del camino de entrada, enfrente del tablón */
-const GRAMO = {x:13, y:24}; OBJ[GRAMO.x+","+GRAMO.y]="J";
-const CALDERO = {x:44, y:13};
+const GRAMO = {x:13, y:25}; OBJ[GRAMO.x+","+GRAMO.y]="J";
+const CALDERO = {x:45, y:10};
 const MAQUINA = {x:21, y:15}; OBJ[MAQUINA.x+","+MAQUINA.y]="A"; OBJ[CALDERO.x+","+CALDERO.y]="U";
 const SPOTIFY_URL = "https://open.spotify.com/playlist/1ido1a7hGXDYKRhZRajsIG?si=_A5kMq_CT0eYuZzUEq-tPw&utm_source=copy-link&pi=jhTGYGu-SfeVi&pt=34e9512b78a712b1f544106b251e8825";
 const tileAt = (x,y) => OBJ[x+","+y] || (MAP[y]&&MAP[y][x]);
@@ -1470,7 +1470,7 @@ const critters = [
   {kind:"esqueleto", rec:{esq:1,attend:"si"}, x:5,y:8, speed:420, rad:0},
   {kind:"cuervo", rec:{char:"cuervo",color:"#17122a",attend:"si"}, x:16,y:2, speed:150, rad:2},
   {kind:"sepulturero", rec:{char:"base",nick:"Sepulturero",avatar:"sepulturero",attend:"si"}, x:4,y:19, speed:400, rad:0},
-  {kind:"bruja", rec:{char:"base",nick:"Bruja",avatar:"bruja",attend:"si",party:"si",hatStyle:3,faceStyle:-1}, x:45,y:14, speed:400, rad:0},
+  {kind:"bruja", rec:{char:"base",nick:"Bruja",avatar:"bruja",attend:"si",party:"si",hatStyle:3,faceStyle:-1}, x:44,y:10, speed:400, rad:0},
 ].map(c=>({...c, fx:c.x, fy:c.y, hx:c.x, hy:c.y, dir:"down", moving:false, t0:0, from:null, next:performance.now()+Math.random()*3000}));
 const wisp = {x:21,y:26, fx:21, fy:26, tx:21, ty:26};
 const WISP_SPOTS = [[21,26],[29,13],[9,27],[26,8],[17,3],[7,12],[5,20],[24,24],[2,17],[27,22]];
