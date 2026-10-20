@@ -1774,8 +1774,8 @@ function drawFrogs(L, g, camX, camY, now){
     if(now>f.next){ f.next=now+3000+Math.random()*5000; if(Math.random()<.5) f.hop=now; else f.croak=now; }
     const hk=f.hop?(now-f.hop)/450:1; if(hk>=1) f.hop=0;
     const blink=Math.sin(now/700+f.x*3)>.97, croak=f.croak&&now-f.croak<600;
-    const spr=FROG_SPR[croak?2:blink?1:0], X=Math.round(f.x*TS-4-camX), Y=Math.round(f.y*TS-7-camY-(f.hop?Math.sin(hk*Math.PI)*7:0));
-    L.push({b:f.y*TS+1, d:()=>g.drawImage(spr,X,Y)});
+    const spr=FROG_SPR[croak?2:blink?1:0], X=Math.round(f.x*TS-9-camX), Y=Math.round(f.y*TS-14-camY-(f.hop?Math.sin(hk*Math.PI)*10:0));
+    L.push({b:f.y*TS+1, d:()=>{ g.fillStyle="rgba(4,8,20,.35)"; g.beginPath(); g.ellipse(X+9,f.y*TS+1-camY,8,2,0,0,7); g.fill(); g.drawImage(spr,X,Y,18,16); }});
   }
 }
 /* Maquinita embrujada (minijuego de almas de colores) */
