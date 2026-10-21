@@ -3160,6 +3160,7 @@ function openProfile(){
   $("#nick").hidden=true; $("#name-show").hidden=false; $("#name-edit").hidden=false;
   $("#err").textContent=""; slotState={};
   buildProfile(); $("#s-prof").hidden=false; closeDialog();
+  call("halloween_seen_avatar"); /* para saber en el panel quién ha llegado a ver su personaje */
 }
 $("#p-back").onclick=()=>{ $("#s-prof").hidden=true; };
 $("#name-edit").onclick=()=>{ const n=$("#nick"); n.value=draft.nick||""; n.hidden=false; $("#name-show").hidden=true; $("#name-edit").hidden=true; n.focus(); n.select(); };

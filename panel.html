@@ -63,7 +63,7 @@ form.add input{flex:1 1 220px;min-width:0;font:15px var(--f-body);background:var
       <h2>Invitados</h2>
       <form class="add" id="add"><input id="nick" maxlength="20" placeholder="Nombre del nuevo invitado" required><button>Añadir y crear enlace</button></form>
       <div class="tablewrap"><table>
-        <thead><tr><th>Invitado</th><th>Ahora</th><th>Casa</th><th>Fiesta</th><th>Entrada</th><th>Bote</th><th>Caramelos</th><th>Tiempo</th><th>Visitas</th><th>Última vez</th><th>Enlace</th></tr></thead>
+        <thead><tr><th>Invitado</th><th>Ahora</th><th>Casa</th><th>Fiesta</th><th>Entrada</th><th>Bote</th><th>Caramelos</th><th>Tiempo</th><th>Visitas</th><th>Ha visto su personaje</th><th>Última vez</th><th>Enlace</th></tr></thead>
         <tbody id="rows"></tbody>
       </table></div>
     </section>
@@ -102,7 +102,7 @@ async function load(){
     const n = cell(tr, x.nick); if(x.is_host){ const h=document.createElement("span"); h.className="host"; h.textContent="ANFITRIÓN"; n.appendChild(h); }
     { const td=document.createElement("td"); const p=document.createElement("span"); const on=live(x); p.className="pill "+(on?"si":""); p.textContent= on ? (x.last_mode==="play"?"Jugando":"En el menú") : "—"; td.appendChild(p); tr.appendChild(td); }
     const td = document.createElement("td"); const p=document.createElement("span"); p.className="pill "+(x.attend||""); p.textContent=L.attend[x.attend]||"Sin responder"; td.appendChild(p); tr.appendChild(td);
-    cell(tr, L.yn[x.party]||"—"); cell(tr, x.party==="si" ? (x.ticket?"Comprada ✓":"Pendiente") : "—"); cell(tr, L.bizum[x.bizum]||"—"); cell(tr, x.candy, "num"); cell(tr, dur(x.total_seconds), "num"); cell(tr, x.visits||0, "num"); cell(tr, fmt(x.last_seen||x.opened_at));
+    cell(tr, L.yn[x.party]||"—"); cell(tr, x.party==="si" ? (x.ticket?"Comprada ✓":"Pendiente") : "—"); cell(tr, L.bizum[x.bizum]||"—"); cell(tr, x.candy, "num"); cell(tr, dur(x.total_seconds), "num"); cell(tr, x.visits||0, "num"); cell(tr, x.is_host ? "—" : x.avatar_seen_at ? `Sí (${x.avatar_seen_count}×)` : "No"); cell(tr, fmt(x.last_seen||x.opened_at));
     const lc = document.createElement("td"); const b=document.createElement("button"); b.className="ghost"; b.textContent="Copiar enlace";
     const link = BASE + "?i=" + x.token;
     b.onclick = async ()=>{ try{ await navigator.clipboard.writeText(link); b.textContent="¡Copiado!"; }catch(e){ prompt("Enlace de "+x.nick, link); } setTimeout(()=>b.textContent="Copiar enlace",1500); };
